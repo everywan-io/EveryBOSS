@@ -2,9 +2,9 @@ from flask import (
     Blueprint, flash, g, redirect, request, session, url_for, jsonify, abort, make_response
 )
 from werkzeug.security import check_password_hash, generate_password_hash
-from flaskr.keystone.authconn import KeystoneAuthConn
-from flaskr.error_handler import Unauthorized, BadRequest, ServerError
-# from flaskr.db import get_db
+from everywan.keystone.authconn import KeystoneAuthConn
+from everywan.error_handler import Unauthorized, BadRequest, ServerError
+# from everywan.db import get_db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 authconn = KeystoneAuthConn()

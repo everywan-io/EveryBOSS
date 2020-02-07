@@ -2,7 +2,7 @@ from keystoneauth1.identity import v3
 from keystoneauth1 import session
 from keystoneclient.v3 import client
 from http import HTTPStatus
-from flaskr.error_handler import Unauthorized
+from everywan.error_handler import Unauthorized
 import logging
 
 
@@ -70,6 +70,7 @@ class KeystoneAuthConn:
 
             return auth_token
         except Exception as e:
+            print(e)
             raise Unauthorized()
 
     def validate_token(self, token):
