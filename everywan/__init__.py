@@ -6,7 +6,7 @@ from .error_handler import init_errorhandler
 from srv6_sdn_control_plane.northbound.grpc import nb_grpc_client
 
 DEFAULT_CONTROLLER_IP = '0.0.0.0'
-DEFAULT_CONTROLLER_PORT = 12345
+DEFAULT_CONTROLLER_PORT = 54321
 
 mongodb_client = PyMongo()
 ctrl_nb_interface = nb_grpc_client.NorthboundInterface(
