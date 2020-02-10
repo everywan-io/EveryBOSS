@@ -11,7 +11,7 @@ autopep8 = "*"
 [packages]
 flask = "*"
 flask-pymongo = "*"
-
+flask-cors = "*"
 
 [requires]
 python_version = "3.6"
