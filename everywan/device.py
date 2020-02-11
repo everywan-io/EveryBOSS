@@ -1,3 +1,17 @@
+#  Copyright 2020 Francesco Lombardo
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
 from flask import (
     Blueprint, flash, g, redirect, request, session, url_for, jsonify, abort, make_response
 )
@@ -17,7 +31,8 @@ authconn = KeystoneAuthConn()
 def list_devices():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        tenantid = 1  # user_token['project_id']
+        # tenantid = user_token['project_id']
+        tenantid = "1"  # user_token['project_id']
         limit = request.args.get('limit', default=20, type=int)
         offset = request.args.get('offset', default=0, type=int)
         devices = mongodb_client.db.devices.find(
@@ -37,7 +52,8 @@ def list_devices():
 def configure_device(device_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        tenantid = 1
+        # tenantid = user_token['project_id']
+        tenantid = "1"  # user_token['project_id']
         request_dict = request.json
         ctrl_nb_interface.configure_device(
             device_id=device_id,

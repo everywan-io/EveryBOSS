@@ -12,6 +12,7 @@ autopep8 = "*"
 flask = "*"
 flask-pymongo = "*"
 flask-cors = "*"
+python-keystoneclient = "*"
 
 [requires]
 python_version = "3.6"
