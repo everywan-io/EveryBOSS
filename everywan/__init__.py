@@ -40,7 +40,8 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'everywan.sqlite'),
     )
-    CORS(app)
+    CORS(app, resources={r"/.*": {"origins": "*"}})
+    app.config['CORS_HEADERS'] = 'Content-Type'
     app.config["MONGO_URI"] = "mongodb://root:12345678@localhost:27017/EveryWan?authSource=admin&readPreference=primary&appname=NBI&ssl=false"
     if test_config is None:
         # load the instance config, if it exists, when not testing

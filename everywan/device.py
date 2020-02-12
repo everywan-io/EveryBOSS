@@ -22,6 +22,7 @@ from everywan import mongodb_client, ctrl_nb_interface
 import everywan.utils as EWUtil
 import json
 from bson import json_util
+from flask_cors import CORS
 
 bp = Blueprint('devices', __name__, url_prefix='/devices')
 authconn = KeystoneAuthConn()

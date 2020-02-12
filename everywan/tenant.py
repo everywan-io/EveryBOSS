@@ -23,9 +23,6 @@ from everywan import ctrl_nb_interface
 bp = Blueprint('tenants', __name__, url_prefix='/tenants')
 authconn = KeystoneAuthConn()
 
-DEFAULT_CONTROLLER_IP = '0.0.0.0'
-DEFAULT_CONTROLLER_PORT = 54321
-
 
 @bp.route('/', methods=(['GET']))
 def list_tenants():

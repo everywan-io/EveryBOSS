@@ -37,14 +37,16 @@ def login():
         user = authconn.get_user(
             user_id=user_token['user_id'], user_token=user_token)
         user_body = {
-            "token_type": "JWT",
+            "token_type": "X-Auth-Token",
             "expires_in": user_token['expires'],
             "access_token": user_token['token'],
             "user": {
                 "locale": "it",
                 "id": user.id,
                 "username": user.name,
-                "domain_id": user.domain_id
+                "domain_id": user.domain_id,
+                "project_id": user_token['project_id'],
+                "project_name": user_token['project_name']
             }
         }
         return jsonify(user_body)

@@ -96,7 +96,10 @@ def assign_slice_ovarlay(overaly_net_id):
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         #tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
-        ctrl_nb_interface.remove_overlay(overaly_net_id, tenantid)
+        request_dict = request.json
+        slice_name = request_dict.get('name')
+        interfaces = request_dict.get('interfaces', [])
+        ctrl_nb_interface.assign_slice_to_overlay(slice_name, tenantid, interfaces)
         return jsonify({})
     except KeyError as e:
         abort(400, description=e)
