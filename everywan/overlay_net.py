@@ -15,9 +15,11 @@
 from flask import (
     Blueprint, flash, g, redirect, request, session, url_for, jsonify, abort, make_response
 )
-from everywan.keystone.authconn import KeystoneAuthConn
+from everywan import mongodb_client, ctrl_nb_interface
 from everywan.error_handler import Unauthorized, BadRequest, ServerError
 from everywan import ctrl_nb_interface
+from everywan.keystone.authconn import KeystoneAuthConn
+import everywan.utils as EWUtil
 
 # from everywan.db import get_db
 
@@ -29,13 +31,13 @@ authconn = KeystoneAuthConn()
 def list_overlay_nets():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        #tenantid = user_token['project_id']
+        # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         limit = request.args.get('limit', default=20, type=int)
         offset = request.args.get('offset', default=0, type=int)
-
-        o_nets = ctrl_nb_interface.get_overlays(None, tenantid=tenantid)
-        return jsonify(o_nets)
+        o_nets = mongodb_client.db.overlays.find(
+            {'tenantid': tenantid}).skip(offset).limit(limit)
+        return jsonify(EWUtil.mongo_cursor_to_json(o_nets))
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
@@ -50,7 +52,7 @@ def list_overlay_nets():
 def create_overlay_net():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        #tenantid = user_token['project_id']
+        # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         request_dict = request.json
         name_overlay = request_dict.get('name')
@@ -94,7 +96,7 @@ def delete_overlay_net(overaly_net_id):
 def assign_slice_ovarlay(overaly_net_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        #tenantid = user_token['project_id']
+        # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         request_dict = request.json
         slice_name = request_dict.get('name')
