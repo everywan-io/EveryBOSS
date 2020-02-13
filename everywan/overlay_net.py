@@ -66,6 +66,7 @@ def get_overlay_net(overaly_net_id):
     except ServerError as e:
         abort(500, description=e.description)
 
+
 @bp.route('/', methods=(['POST']))
 def create_overlay_net():
     try:
@@ -76,9 +77,9 @@ def create_overlay_net():
         name_overlay = request_dict.get('name')
         type_overlay = request_dict.get('type')
         interfaces = request_dict.get('interfaces', [])
-        encap = request_dict.get('encap')
+        tunnel_type = request_dict.get('tunnel_type')
         o_net = ctrl_nb_interface.create_overlay(
-            name_overlay, type_overlay, interfaces, tenantid, encap)
+            name_overlay, type_overlay, interfaces, tenantid, tunnel_type)
         return jsonify({})
     except KeyError as e:
         print(e)
