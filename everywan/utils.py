@@ -23,5 +23,5 @@ def mongo_cursor_to_json(mongo_cursor):
 
 
 def id_to_string(item):
-    item._id = str(item._id)
+    item['_id'] = str(item['_id'])
     return item

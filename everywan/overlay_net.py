@@ -15,9 +15,9 @@
 from flask import (
     Blueprint, flash, g, redirect, request, session, url_for, jsonify, abort, make_response
 )
+from bson.objectid import ObjectId
 from everywan import mongodb_client, ctrl_nb_interface
 from everywan.error_handler import Unauthorized, BadRequest, ServerError
-from everywan import ctrl_nb_interface
 from everywan.keystone.authconn import KeystoneAuthConn
 import everywan.utils as EWUtil
 
@@ -47,6 +47,24 @@ def list_overlay_nets():
     except ServerError as e:
         abort(500, description=e.description)
 
+
+@bp.route('/<overaly_net_id>', methods=(['GET']))
+def get_overlay_net(overaly_net_id):
+    try:
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        # tenantid = user_token['project_id']
+        tenantid = "1"  # user_token['project_id']
+        o_net = mongodb_client.db.overlays.find_one(
+            {'tenantid': tenantid, '_id': ObjectId(overaly_net_id)})
+        return jsonify(EWUtil.id_to_string(o_net))
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
 
 @bp.route('/', methods=(['POST']))
 def create_overlay_net():
