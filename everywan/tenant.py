@@ -59,8 +59,15 @@ def create_tenant():
 @bp.route('/<tenant_id>', methods=(['GET']))
 def get_tenant(tenant_id):
     try:
+        tenant = {}
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        tentat = authconn.get_project(tenant_id, user_token)
+        project = authconn.get_project(tenant_id, user_token)
+        if (project):
+            tentat = {
+                "name": project.name,
+                "id": project.id,
+                "domain_id": project.domain_id
+            }
         return jsonify(tentat)
     except KeyError as e:
         abort(400, description=e)
