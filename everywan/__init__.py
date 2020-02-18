@@ -13,13 +13,13 @@
 #  limitations under the License.
 
 import os
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from .error_handler import init_errorhandler
 from srv6_sdn_control_plane.northbound.grpc import nb_grpc_client
 
-DEFAULT_CONTROLLER_IP = '0.0.0.0'
+DEFAULT_CONTROLLER_IP = '11.3.192.117'
 DEFAULT_CONTROLLER_PORT = 54321
 
 mongodb_client = PyMongo()
@@ -56,6 +56,10 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    @app.route('/dashboard', methods=(['GET']))
+    def dashboard():
+        return jsonify({})
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(device.bp)
