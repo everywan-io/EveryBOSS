@@ -238,7 +238,7 @@ class KeystoneAuthConn:
         """
         try:
             proj = self.keystone.projects.get(project=project)
-            return proj[0]
+            return proj
         except Exception as e:
             self.logger.exception(e)
             raise Unauthorized()
