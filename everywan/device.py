@@ -23,6 +23,7 @@ import everywan.utils as EWUtil
 import json
 from bson import json_util
 from flask_cors import CORS
+from srv6_sdn_proto.status_codes_pb2 import NbStatusCode
 
 bp = Blueprint('devices', __name__, url_prefix='/devices')
 authconn = KeystoneAuthConn()
@@ -71,6 +72,7 @@ def get_device(device_id):
     except ServerError as e:
         abort(500, description=e.description)
 
+
 @bp.route('/<device_id>', methods=(['POST']))
 def configure_device(device_id):
     try:
@@ -78,13 +80,55 @@ def configure_device(device_id):
         # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         request_dict = request.json
-        ctrl_nb_interface.configure_device(
+        code, reason = ctrl_nb_interface.configure_device(
             device_id=device_id,
             tenantid=tenantid,
             device_name=request_dict.get('name', ''),
             device_description=request_dict.get('description', ''),
             interfaces=request_dict.get('interfaces', [])
         )
+        return jsonify({})
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
+
+
+@bp.route('/<device_id>/enable', methods=(['POST']))
+def enable_device(device_id):
+    try:
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        # tenantid = user_token['project_id']
+        tenantid = "1"  # user_token['project_id']
+        code, reason = ctrl_nb_interface.enable_device(
+            deviceid=device_id, tenantid=tenantid)
+        if code != NbStatusCode.STATUS_OK:
+            raise ServerError(description=reason)
+        return jsonify({})
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
+
+
+@bp.route('/<device_id>/disable', methods=(['POST']))
+def disable_device(device_id):
+    try:
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        # tenantid = user_token['project_id']
+        tenantid = "1"  # user_token['project_id']
+        code, reason = ctrl_nb_interface.disable_device(
+            deviceid=device_id, tenantid=tenantid)
+        if code != NbStatusCode.STATUS_OK:
+            raise ServerError(description=reason)
         return jsonify({})
     except KeyError as e:
         abort(400, description=e)
