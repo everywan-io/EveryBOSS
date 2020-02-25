@@ -20,6 +20,7 @@ from everywan import mongodb_client, ctrl_nb_interface
 from everywan.error_handler import Unauthorized, BadRequest, ServerError
 from everywan.keystone.authconn import KeystoneAuthConn
 import everywan.utils as EWUtil
+from srv6_sdn_proto.status_codes_pb2 import NbStatusCode
 
 # from everywan.db import get_db
 
@@ -76,10 +77,16 @@ def create_overlay_net():
         request_dict = request.json
         name_overlay = request_dict.get('name')
         type_overlay = request_dict.get('type')
-        interfaces = request_dict.get('interfaces', [])
+        slices = request_dict.get('slices', [])
         tunnel_type = request_dict.get('tunnel_type')
-        o_net = ctrl_nb_interface.create_overlay(
-            name_overlay, type_overlay, interfaces, tenantid, tunnel_type)
+        code, reason = ctrl_nb_interface.create_overlay(
+            name_overlay, type_overlay, slices, tenantid, tunnel_type)
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+            raise ServerError(description=reason)
+        elif code == NbStatusCode.BAD_REQUEST:
+            raise BadRequest(description=reason)
+        elif code == NbStatusCode.UNAUTHORIZED:
+            raise Unauthorized(description=reason)
         return jsonify({})
     except KeyError as e:
         print(e)
@@ -99,7 +106,13 @@ def delete_overlay_net(overaly_net_id):
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         #tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
-        ctrl_nb_interface.remove_overlay(overaly_net_id, tenantid)
+        code, reason = ctrl_nb_interface.remove_overlay(overaly_net_id, tenantid)
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+            raise ServerError(description=reason)
+        elif code == NbStatusCode.BAD_REQUEST:
+            raise BadRequest(description=reason)
+        elif code == NbStatusCode.UNAUTHORIZED:
+            raise Unauthorized(description=reason)
         return jsonify({})
     except KeyError as e:
         abort(400, description=e)
@@ -120,7 +133,13 @@ def assign_slice_ovarlay(overaly_net_id):
         request_dict = request.json
         slice_name = request_dict.get('name')
         interfaces = request_dict.get('interfaces', [])
-        ctrl_nb_interface.assign_slice_to_overlay(slice_name, tenantid, interfaces)
+        code, reason = ctrl_nb_interface.assign_slice_to_overlay(slice_name, tenantid, interfaces)
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+            raise ServerError(description=reason)
+        elif code == NbStatusCode.BAD_REQUEST:
+            raise BadRequest(description=reason)
+        elif code == NbStatusCode.UNAUTHORIZED:
+            raise Unauthorized(description=reason)
         return jsonify({})
     except KeyError as e:
         abort(400, description=e)
