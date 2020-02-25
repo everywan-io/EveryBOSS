@@ -87,7 +87,7 @@ def configure_device(device_id):
             device_description=request_dict.get('description', ''),
             interfaces=request_dict.get('interfaces', [])
         )
-        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.SERVICE_UNAVAILABLE:
             raise ServerError(description=reason)
         elif code == NbStatusCode.BAD_REQUEST:
             raise BadRequest(description=reason)
@@ -112,7 +112,7 @@ def enable_device(device_id):
         tenantid = "1"  # user_token['project_id']
         code, reason = ctrl_nb_interface.enable_device(
             deviceid=device_id, tenantid=tenantid)
-        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.SERVICE_UNAVAILABLE:
             raise ServerError(description=reason)
         elif code == NbStatusCode.BAD_REQUEST:
             raise BadRequest(description=reason)
@@ -137,7 +137,7 @@ def disable_device(device_id):
         tenantid = "1"  # user_token['project_id']
         code, reason = ctrl_nb_interface.disable_device(
             deviceid=device_id, tenantid=tenantid)
-        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.SERVICE_UNAVAILABLE:
             raise ServerError(description=reason)
         elif code == NbStatusCode.BAD_REQUEST:
             raise BadRequest(description=reason)

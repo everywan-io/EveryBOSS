@@ -81,7 +81,7 @@ def create_overlay_net():
         tunnel_type = request_dict.get('tunnel_type')
         code, reason = ctrl_nb_interface.create_overlay(
             name_overlay, type_overlay, slices, tenantid, tunnel_type)
-        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.SERVICE_UNAVAILABLE:
             raise ServerError(description=reason)
         elif code == NbStatusCode.BAD_REQUEST:
             raise BadRequest(description=reason)
@@ -107,7 +107,7 @@ def delete_overlay_net(overaly_net_id):
         #tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         code, reason = ctrl_nb_interface.remove_overlay(overaly_net_id, tenantid)
-        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.SERVICE_UNAVAILABLE:
             raise ServerError(description=reason)
         elif code == NbStatusCode.BAD_REQUEST:
             raise BadRequest(description=reason)
@@ -134,7 +134,7 @@ def assign_slice_ovarlay(overaly_net_id):
         slice_name = request_dict.get('name')
         interfaces = request_dict.get('interfaces', [])
         code, reason = ctrl_nb_interface.assign_slice_to_overlay(slice_name, tenantid, interfaces)
-        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+        if code == NbStatusCode.INTERNAL_SERVER_ERROR or code == NbStatusCode.SERVICE_UNAVAILABLE:
             raise ServerError(description=reason)
         elif code == NbStatusCode.BAD_REQUEST:
             raise BadRequest(description=reason)
