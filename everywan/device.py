@@ -50,6 +50,34 @@ def list_devices():
         abort(500, description=e.description)
 
 
+@bp.route('/interfaces', methods=(['GET']))
+def list_interfaces():
+    try:
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        interfaces = []
+        # tenantid = user_token['project_id']
+        tenantid = "1"  # user_token['project_id']
+        limit = request.args.get('limit', default=20, type=int)
+        offset = request.args.get('offset', default=0, type=int)
+        devices = mongodb_client.db.devices.find(
+            {'tenantid': tenantid}).skip(offset).limit(limit)
+        devices = EWUtil.mongo_cursor_to_json(devices)
+
+        for device in devices:
+            for interface in interfaces:
+                interface['deviceId'] = device.deviceid
+                interfaces.append(interface)
+        return jsonify(interfaces)
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
+
+
 @bp.route('/<device_id>', methods=(['GET']))
 def get_device(device_id):
     try:
@@ -92,7 +120,7 @@ def configure_device(device_id):
         elif code == NbStatusCode.STATUS_BAD_REQUEST:
             raise BadRequest(description=reason)
         elif code == NbStatusCode.STATUS_UNAUTHORIZED:
-            raise Unauthorized(description=reason)
+            raise Unauthorized()
         return jsonify({})
     except KeyError as e:
         abort(400, description=e)
