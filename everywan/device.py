@@ -64,8 +64,12 @@ def list_interfaces():
         devices = EWUtil.mongo_cursor_to_json(devices)
 
         for device in devices:
-            for interface in interfaces:
-                interface['deviceId'] = device.deviceid
+            for interface in device['interfaces']:
+                interface['device'] = {
+                    'name': device['name'],
+                    'deviceid': device['deviceid']
+                }
+                interface['deviceid'] = device['deviceid']
                 interfaces.append(interface)
         return jsonify(interfaces)
     except KeyError as e:
