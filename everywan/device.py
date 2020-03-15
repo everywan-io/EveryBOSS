@@ -110,8 +110,12 @@ def configure_device(device_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+       
         request_dict = request.json
+        tenantid = "1"  # user_token['project_id']
+        device_name=request_dict.get('name', '')
+        device_description=request_dict.get('description', '')
+        interfaces=request_dict.get('interfaces', [])
         code, reason = ctrl_nb_interface.configure_device(
             device_id=device_id,
             tenantid=tenantid,
