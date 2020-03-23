@@ -29,7 +29,7 @@ def list_tenants():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         tentats = authconn.get_project_list(user_token)
-        
+
         return jsonify(tentats)
     except KeyError as e:
         abort(400, description=e)
@@ -64,8 +64,12 @@ def get_tenant(tenant_id):
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         project = authconn.get_project(tenant_id, user_token)
         if (project):
-            tenant = mongodb_client.db.tenants.find_one({'tenantid': tenant_id}, {'_id': 0})
+            tenant_id = '1'
+            tenant = mongodb_client.db.tenants.find_one(
+                {'tenantid': tenant_id}, {'_id': 0})
             if tenant:
+                tenant['domain_id'] = project.domain_id
+                tenant['name'] = project.name
                 return jsonify(tenant)
         raise TenantNotFound(tenant_id=tenant_id)
     except KeyError as e:
