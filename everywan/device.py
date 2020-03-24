@@ -57,20 +57,99 @@ def list_interfaces():
         interfaces = []
         # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
-        limit = request.args.get('limit', default=20, type=int)
-        offset = request.args.get('offset', default=0, type=int)
-        devices = mongodb_client.db.devices.find(
-            {'tenantid': tenantid}).skip(offset).limit(limit)
-        devices = EWUtil.mongo_cursor_to_json(devices)
+        # limit = request.args.get('limit', default=20, type=int)
+        # offset = request.args.get('offset', default=0, type=int)
+        available = request.args.get('available', default=False, type=bool)
 
-        for device in devices:
-            for interface in device['interfaces']:
-                interface['device'] = {
-                    'name': device['name'],
-                    'deviceid': device['deviceid']
+        pipe_on_available = [
+            {
+                '$match': {
+                    'enabled': True,
+                    'connected': True,
+                    'configured': True,
+                    'tenantid': tenantid
                 }
-                interface['deviceid'] = device['deviceid']
-                interfaces.append(interface)
+            }, {
+                '$unwind': {
+                    'path': '$interfaces',
+                    'preserveNullAndEmptyArrays': False
+                }
+            }, {
+                '$project': {
+                    'name': '$interfaces.name',
+                    'type': '$interfaces.type',
+                    'deviceid': '$deviceid',
+                    'tenantid': '$tenantid'
+                }
+            }, {
+                '$match': {
+                    'type': 'lan'
+                }
+            }, {
+                '$lookup': {
+                    'from': 'overlays',
+                    'let': {
+                        'deviceid': '$deviceid',
+                        'name': '$name',
+                        'tenantid': '$tenantid'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$tenantid', '$$tenantid'
+                                    ]
+                                },
+                                '$expr': {
+                                    '$and': [
+                                        {
+                                            '$in': [
+                                                '$$name', '$slices.interface_name'
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'overaly'
+                }
+            }, {
+                '$match': {
+                    '$expr': {
+                        '$eq': [
+                            0, {
+                                '$size': '$overaly'
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+
+        if available:
+            pipeline = pipe_on_available
+        else:
+            pipeline = [
+                {
+                    '$unwind': {
+                        'path': '$interfaces',
+                        'preserveNullAndEmptyArrays': False
+                    }
+                },
+                {
+                    '$project': {
+                        'name': '$interfaces.name',
+                        'type': '$interfaces.type',
+                        'deviceid': '$deviceid',
+                        'tenantid': '$tenantid'
+                    }
+                }
+            ]
+
+        interfaces = mongodb_client.db.devices.aggregate(pipeline)
+        interfaces = EWUtil.mongo_cursor_to_json(interfaces)
         return jsonify(interfaces)
     except KeyError as e:
         abort(400, description=e)
@@ -110,12 +189,12 @@ def configure_device(device_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
-       
+
         request_dict = request.json
         tenantid = "1"  # user_token['project_id']
-        device_name=request_dict.get('name', '')
-        device_description=request_dict.get('description', '')
-        interfaces=request_dict.get('interfaces', [])
+        device_name = request_dict.get('name', '')
+        device_description = request_dict.get('description', '')
+        interfaces = request_dict.get('interfaces', [])
         code, reason = ctrl_nb_interface.configure_device(
             device_id=device_id,
             tenantid=tenantid,
