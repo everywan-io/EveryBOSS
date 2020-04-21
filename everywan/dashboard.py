@@ -37,10 +37,10 @@ def dashboard():
         # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         result = {
-            operators: {},
-            tenants: {},
-            overlays: {},
-            devices: {}
+            'operators': {},
+            'tenants': {},
+            'overlays': {},
+            'devices': {}
         }
         devices = mongodb_client.db.devices.find({'tenantid': tenantid})
 
