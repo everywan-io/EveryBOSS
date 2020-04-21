@@ -37,13 +37,15 @@ def dashboard():
         # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         result = {
-            'operators': {},
+            'operators': { 'total': 1},
             'tenants': {},
-            'overlays': {},
-            'devices': {}
+            'overlays': {'total': 0},
+            'devices': {'total': 0}
         }
         devices = mongodb_client.db.devices.find({'tenantid': tenantid})
-
+        o_nets = mongodb_client.db.overlays.find({'tenantid': tenantid}).count()
+        if o_nets:
+            result['overlays']['total'] = o_nets
         return jsonify(result)
     except KeyError as e:
         abort(400, description=e)
