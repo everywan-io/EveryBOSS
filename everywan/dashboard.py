@@ -42,27 +42,32 @@ def dashboard():
             'overlays': {'total': 0},
             'devices': {'total': 0}
         }
-        devices_tot = mongodb_client.db.devices.find({'tenantid': tenantid}).count()
-        print(devices_tot)
+
+        devices_tot = mongodb_client.db.devices.find(
+            {'tenantid': tenantid}).count()
         if devices_tot is not None:
             result['devices']['total'] = devices_tot
 
-        devices_enab = mongodb_client.db.devices.find({'tenantid': tenantid, 'enabled': True}).count()
-        print(devices_enab)
+        devices_enab = mongodb_client.db.devices.find(
+            {'tenantid': tenantid, 'enabled': True}).count()
         if devices_enab is not None:
             result['devices']['enabled'] = devices_enab
-        
-        devices_conf = mongodb_client.db.devices.find({'tenantid': tenantid, 'configured': True}).count()
+
+        devices_conf = mongodb_client.db.devices.find(
+            {'tenantid': tenantid, 'configured': True}).count()
         if devices_conf is not None:
             result['devices']['configured'] = devices_conf
 
-        devices_conn = mongodb_client.db.devices.find({'tenantid': tenantid, 'connected': True}).count()
+        devices_conn = mongodb_client.db.devices.find(
+            {'tenantid': tenantid, 'connected': True}).count()
         if devices_conn is not None:
-            result['devices']['total'] = devices_conn
+            result['devices']['connected'] = devices_conn
 
-        o_nets = mongodb_client.db.overlays.find({'tenantid': tenantid}).count()
+        o_nets = mongodb_client.db.overlays.find(
+            {'tenantid': tenantid}).count()
         if o_nets:
             result['overlays']['total'] = o_nets
+
         return jsonify(result)
     except KeyError as e:
         abort(400, description=e)
