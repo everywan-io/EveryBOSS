@@ -37,12 +37,27 @@ def dashboard():
         # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         result = {
-            'operators': { 'total': 1},
+            'operators': {'total': 1},
             'tenants': {},
             'overlays': {'total': 0},
             'devices': {'total': 0}
         }
-        devices = mongodb_client.db.devices.find({'tenantid': tenantid})
+        devices_tot = mongodb_client.db.devices.find({'tenantid': tenantid}).count()
+        if devices_tot:
+            result['devices']['total'] = devices_tot
+
+        devices_enab = mongodb_client.db.devices.find({'tenantid': tenantid, 'enabled': True}).count()
+        if devices_enab:
+            result['devices']['enabled'] = devices_enab
+        
+        devices_conf = mongodb_client.db.devices.find({'tenantid': tenantid, 'configured': True}).count()
+        if devices_conf:
+            result['devices']['configured'] = devices_conf
+
+        devices_conn = mongodb_client.db.devices.find({'tenantid': tenantid, 'connected': True}).count()
+        if devices_conn:
+            result['devices']['total'] = devices_conn
+
         o_nets = mongodb_client.db.overlays.find({'tenantid': tenantid}).count()
         if o_nets:
             result['overlays']['total'] = o_nets
