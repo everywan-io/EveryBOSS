@@ -43,10 +43,12 @@ def dashboard():
             'devices': {'total': 0}
         }
         devices_tot = mongodb_client.db.devices.find({'tenantid': tenantid}).count()
+        print(devices_tot)
         if devices_tot:
             result['devices']['total'] = devices_tot
 
         devices_enab = mongodb_client.db.devices.find({'tenantid': tenantid, 'enabled': True}).count()
+        print(devices_enab)
         if devices_enab:
             result['devices']['enabled'] = devices_enab
         
