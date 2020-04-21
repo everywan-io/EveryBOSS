@@ -33,6 +33,7 @@ def create_app(test_config=None):
     from . import operator
     from . import overlay_net
     from . import tenant
+    from . import dashboard
 
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -57,10 +58,9 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    @app.route('/dashboard', methods=(['GET']))
-    def dashboard():
-        return jsonify({})
+    
 
+    app.register_blueprint(dashboard.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(device.bp)
     app.register_blueprint(operator.bp)
