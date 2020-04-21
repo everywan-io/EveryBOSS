@@ -49,14 +49,14 @@ def list_overlay_nets():
         abort(500, description=e.description)
 
 
-@bp.route('/<overaly_net_id>', methods=(['GET']))
-def get_overlay_net(overaly_net_id):
+@bp.route('/<overlay_net_id>', methods=(['GET']))
+def get_overlay_net(overlay_net_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
         o_net = mongodb_client.db.overlays.find_one(
-            {'tenantid': tenantid, '_id': ObjectId(overaly_net_id)})
+            {'tenantid': tenantid, '_id': ObjectId(overlay_net_id)})
         return jsonify(EWUtil.id_to_string(o_net))
     except KeyError as e:
         abort(400, description=e)
@@ -100,13 +100,13 @@ def create_overlay_net():
         abort(500, description=e.description)
 
 
-@bp.route('/<overaly_net_id>', methods=(['DELETE']))
-def delete_overlay_net(overaly_net_id):
+@bp.route('/<overlay_net_id>', methods=(['DELETE']))
+def delete_overlay_net(overlay_net_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         #tenantid = user_token['project_id']
         tenantid = "1"  # user_token['project_id']
-        code, reason = ctrl_nb_interface.remove_overlay(overaly_net_id, tenantid)
+        code, reason = ctrl_nb_interface.remove_overlay(overlay_net_id, tenantid)
         if code == NbStatusCode.STATUS_INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
             raise ServerError(description=reason)
         elif code == NbStatusCode.STATUS_BAD_REQUEST:
@@ -124,8 +124,8 @@ def delete_overlay_net(overaly_net_id):
         abort(500, description=e.description)
 
 
-@bp.route('/<overaly_net_id>/slices', methods=(['post']))
-def assign_slice_ovarlay(overaly_net_id):
+@bp.route('/<overlay_net_id>/slices', methods=(['post']))
+def assign_slice_ovarlay(overlay_net_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']

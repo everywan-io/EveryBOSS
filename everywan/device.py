@@ -113,14 +113,14 @@ def list_interfaces():
                             }
                         }
                     ],
-                    'as': 'overaly'
+                    'as': 'overlay'
                 }
             }, {
                 '$match': {
                     '$expr': {
                         '$eq': [
                             0, {
-                                '$size': '$overaly'
+                                '$size': '$overlay'
                             }
                         ]
                     }

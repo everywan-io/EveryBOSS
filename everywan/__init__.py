@@ -58,8 +58,6 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    
-
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(device.bp)
