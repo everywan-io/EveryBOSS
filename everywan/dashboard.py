@@ -44,20 +44,20 @@ def dashboard():
         }
         devices_tot = mongodb_client.db.devices.find({'tenantid': tenantid}).count()
         print(devices_tot)
-        if devices_tot:
+        if devices_tot is not None:
             result['devices']['total'] = devices_tot
 
         devices_enab = mongodb_client.db.devices.find({'tenantid': tenantid, 'enabled': True}).count()
         print(devices_enab)
-        if devices_enab:
+        if devices_enab is not None:
             result['devices']['enabled'] = devices_enab
         
         devices_conf = mongodb_client.db.devices.find({'tenantid': tenantid, 'configured': True}).count()
-        if devices_conf:
+        if devices_conf is not None:
             result['devices']['configured'] = devices_conf
 
         devices_conn = mongodb_client.db.devices.find({'tenantid': tenantid, 'connected': True}).count()
-        if devices_conn:
+        if devices_conn is not None:
             result['devices']['total'] = devices_conn
 
         o_nets = mongodb_client.db.overlays.find({'tenantid': tenantid}).count()
