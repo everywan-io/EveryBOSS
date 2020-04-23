@@ -76,7 +76,7 @@ def list_interfaces():
                 }
             }, {
                 '$project': {
-                    'device_name': '$name'
+                    'device_name': '$name',
                     'name': '$interfaces.name',
                     'ipv4_addrs': '$interfaces.ipv4_addrs',
                     'type': '$interfaces.type',
@@ -142,7 +142,7 @@ def list_interfaces():
                 },
                 {
                     '$project': {
-                        'device_name': '$name'
+                        'device_name': '$name',
                         'name': '$interfaces.name',
                         'ipv4_addrs': '$interfaces.ipv4_addrs',
                         'type': '$interfaces.type',
