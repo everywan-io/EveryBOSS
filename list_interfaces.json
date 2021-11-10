@@ -1,0 +1,50 @@
+[
+	{
+		"_id": "617814ce23328ae8d7bd640c",
+		"device_name": "ewED4",
+		"deviceid": "0ab0549b-81ce-a785-a1aa-d1d143fd07ca",
+		"ipv4_addrs": [
+			"192.168.56.42/24"
+		],
+		"name": "ewED4-eth1",
+		"overlay": [],
+		"tenantid": "1",
+		"type": "lan"
+	},
+	{
+		"_id": "617814ce23328ae8d7bd640c",
+		"device_name": "ewED4",
+		"deviceid": "0ab0549b-81ce-a785-a1aa-d1d143fd07ca",
+		"ipv4_addrs": [
+			"192.168.58.42/24"
+		],
+		"name": "ewED4-eth2",
+		"overlay": [],
+		"tenantid": "1",
+		"type": "lan"
+	},
+	{
+		"_id": "617814d323328ae8d7bd640d",
+		"device_name": "ewED1",
+		"deviceid": "bde2bcad-1d7c-6dba-1fd0-1ba8d3c2c468",
+		"ipv4_addrs": [
+			"192.168.40.30/24"
+		],
+		"name": "ewED1-eth2",
+		"overlay": [],
+		"tenantid": "1",
+		"type": "lan"
+	},
+	{
+		"_id": "617814d323328ae8d7bd640d",
+		"device_name": "ewED1",
+		"deviceid": "bde2bcad-1d7c-6dba-1fd0-1ba8d3c2c468",
+		"ipv4_addrs": [
+			"192.168.42.30/24"
+		],
+		"name": "ewED1-eth3",
+		"overlay": [],
+		"tenantid": "1",
+		"type": "lan"
+	}
+]

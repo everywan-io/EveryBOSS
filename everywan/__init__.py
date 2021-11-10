@@ -34,6 +34,7 @@ def create_app(test_config=None):
     from . import overlay_net
     from . import tenant
     from . import dashboard
+    from . import measurement_sessions
 
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -63,6 +64,7 @@ def create_app(test_config=None):
     app.register_blueprint(device.bp)
     app.register_blueprint(operator.bp)
     app.register_blueprint(overlay_net.bp)
+    app.register_blueprint(measurement_sessions.bp)
     app.register_blueprint(tenant.bp)
 
     return app

@@ -1,0 +1,120 @@
+[
+	{
+		"_id": "617814d323328ae8d7bd640d",
+		"configured": true,
+		"connected": true,
+		"description": "ewED1-descr",
+		"deviceid": "bde2bcad-1d7c-6dba-1fd0-1ba8d3c2c468",
+		"enabled": true,
+		"external_ip": "10.0.22.5",
+		"external_port": 40000,
+		"features": [
+			{
+				"name": "gRPC",
+				"port": 12345
+			},
+			{
+				"name": "SSH",
+				"port": 22
+			}
+		],
+		"interfaces": [
+			{
+				"ext_ipv4_addrs": [],
+				"ext_ipv6_addrs": [],
+				"ipv4_addrs": [
+					"127.0.0.1/8"
+				],
+				"ipv4_subnets": [],
+				"ipv6_addrs": [
+					"::1/128"
+				],
+				"ipv6_subnets": [],
+				"mac_addr": "00:00:00:00:00:00",
+				"name": "lo",
+				"type": "unknown"
+			},
+			{
+				"ext_ipv4_addrs": [
+					"10.0.22.5"
+				],
+				"ext_ipv6_addrs": [],
+				"ipv4_addrs": [
+					"10.0.14.45/30"
+				],
+				"ipv4_subnets": [],
+				"ipv6_addrs": [
+					"fe80::85d:6bff:feaa:9456/64"
+				],
+				"ipv6_subnets": [],
+				"mac_addr": "0a:5d:6b:aa:94:56",
+				"name": "ewED1-eth0",
+				"type": "wan"
+			},
+			{
+				"ext_ipv4_addrs": [],
+				"ext_ipv6_addrs": [],
+				"ipv4_addrs": [
+					"192.168.38.30/24"
+				],
+				"ipv4_subnets": [],
+				"ipv6_addrs": [
+					"fe80::fcbd:40ff:fe21:2ef8/64"
+				],
+				"ipv6_subnets": [],
+				"mac_addr": "fe:bd:40:21:2e:f8",
+				"name": "ewED1-eth1",
+				"type": "lan"
+			},
+			{
+				"ext_ipv4_addrs": [],
+				"ext_ipv6_addrs": [],
+				"ipv4_addrs": [
+					"192.168.40.30/24"
+				],
+				"ipv4_subnets": [],
+				"ipv6_addrs": [
+					"fe80::5487:afff:fe19:922b/64"
+				],
+				"ipv6_subnets": [],
+				"mac_addr": "56:87:af:19:92:2b",
+				"name": "ewED1-eth2",
+				"type": "lan"
+			},
+			{
+				"ext_ipv4_addrs": [],
+				"ext_ipv6_addrs": [],
+				"ipv4_addrs": [
+					"192.168.42.30/24"
+				],
+				"ipv4_subnets": [],
+				"ipv6_addrs": [
+					"fe80::8477:ddff:fe84:f39f/64"
+				],
+				"ipv6_subnets": [],
+				"mac_addr": "86:77:dd:84:f3:9f",
+				"name": "ewED1-eth3",
+				"type": "lan"
+			}
+		],
+		"mgmt_mac": "66:5e:c0:68:aa:fe",
+		"mgmtip": "169.254.0.2",
+		"name": "ewED1",
+		"nat_type": "Full-cone NAT",
+		"registration_timestamp": "2021-10-26 14:46:43.895150",
+		"stats": {
+			"counters": {
+				"tunnels": [
+					{
+						"counter": 1,
+						"tunnel_mode": "SRv6"
+					}
+				]
+			}
+		},
+		"tenantid": "1",
+		"tunnel_mode": "vxlan",
+		"vtep_ip_addr": null,
+		"vxlan_port": 40000
+	}
+]

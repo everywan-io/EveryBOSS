@@ -13,13 +13,14 @@
 #  limitations under the License.
 
 from flask import (
-    Blueprint, flash, g, redirect, request, session, url_for, jsonify, abort, make_response
+    Blueprint, flash, g, redirect, request, session, url_for, jsonify, abort, make_response, json
 )
 from bson.objectid import ObjectId
 from everywan import mongodb_client, ctrl_nb_interface
 from everywan.error_handler import Unauthorized, BadRequest, ServerError
 from everywan.keystone.authconn import KeystoneAuthConn
 import everywan.utils as EWUtil
+import json
 from srv6_sdn_proto.status_codes_pb2 import NbStatusCode
 
 # from everywan.db import get_db
@@ -31,14 +32,17 @@ authconn = KeystoneAuthConn()
 @bp.route('/', methods=(['GET']))
 def list_overlay_nets():
     try:
-        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
-        limit = request.args.get('limit', default=20, type=int)
-        offset = request.args.get('offset', default=0, type=int)
-        o_nets = mongodb_client.db.overlays.find(
-            {'tenantid': tenantid}).skip(offset).limit(limit)
-        return jsonify(EWUtil.mongo_cursor_to_json(o_nets))
+        #tenantid = "1"  # user_token['project_id']
+        #limit = request.args.get('limit', default=20, type=int)
+        #offset = request.args.get('offset', default=0, type=int)
+        #o_nets = mongodb_client.db.overlays.find(
+        #    {'tenantid': tenantid}).skip(offset).limit(limit)
+        #return jsonify(EWUtil.mongo_cursor_to_json(o_nets))
+        with open('list_overlay_nets.json', "r") as fileJson:
+            overlay_nets = json.load(fileJson)
+        return jsonify(overlay_nets)
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
@@ -52,12 +56,15 @@ def list_overlay_nets():
 @bp.route('/<overlay_net_id>', methods=(['GET']))
 def get_overlay_net(overlay_net_id):
     try:
-        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
-        o_net = mongodb_client.db.overlays.find_one(
-            {'tenantid': tenantid, '_id': ObjectId(overlay_net_id)})
-        return jsonify(EWUtil.id_to_string(o_net))
+        #tenantid = "1"  # user_token['project_id']
+        #o_net = mongodb_client.db.overlays.find_one(
+        #    {'tenantid': tenantid, '_id': ObjectId(overlay_net_id)})
+        #return jsonify(EWUtil.id_to_string(o_net))
+        with open('get_overlay_net.json', "r") as fileJson:
+            data = json.load(fileJson)
+        return jsonify(data)
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
