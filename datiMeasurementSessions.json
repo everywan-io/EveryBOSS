@@ -2,7 +2,7 @@
 	{
 	"sessionId": "101",
 	"sessionDescription": "session-101",
-	"status": "running",
+	"status": "Running",
 	"senderDeviceId": "f92e6cda-47a0-3d52-3c9124f3ba7d5ab1",
 	"senderName": "ewED1",
 	"senderStampIp": "fcff:1::1",
@@ -24,7 +24,7 @@
 	{
 	"sessionId" : "102",
 	"sessionDescription" : "session-102",
-	"status" : "running",
+	"status" : "Running",
 	"senderDeviceId" : "f92e6cda-47a0-3d52-3c9124f3ba7d5ab1",
 	"senderName" : "ewED1",
 	"senderStampIp" : "fcff:1::1",
@@ -46,7 +46,7 @@
 	{
 	"sessionId" : "103",
 	"sessionDescription" : "session-103",
-	"status" : "running",
+	"status" : "Running",
 	"senderDeviceId" : "f92e6cda-47a0-3d52-3c9124f3ba7d5ab1",
 	"senderName" : "ewED1",
 	"senderStampIp" : "fcff:1::1",

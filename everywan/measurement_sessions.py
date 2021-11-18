@@ -21,6 +21,7 @@ from everywan.error_handler import Unauthorized, BadRequest, ServerError
 from everywan.keystone.authconn import KeystoneAuthConn
 import everywan.utils as EWUtil
 import json
+import urllib
 from srv6_sdn_proto.status_codes_pb2 import NbStatusCode
 
 # from everywan.db import get_db
@@ -62,6 +63,63 @@ def get_measurement_sessions(measurement_sessions_id):
         #return jsonify(EWUtil.id_to_string(o_net))
         counter = 0
         with open('datiMeasurementSessions.json', "r") as fileJson:
+            data = json.load(fileJson)
+        for elemento in data:
+            if(int(elemento['sessionId']) == int(measurement_sessions_id)):
+                counter = 1
+                return elemento
+        if(counter == 0):
+            return "Resource not found... no 'sessionId' matches 'id: " + measurement_sessions_id + "'"
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
+
+s = {'type' : 'delay', 'direction' : 'both'}
+#+urllib.parse.urlencode(s)
+
+@bp.route('/<measurement_sessions_id>/details', methods=(['GET']))
+def get_measurement_sessions_details(measurement_sessions_id):
+    try:
+        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        # tenantid = user_token['project_id']
+        #tenantid = "1"  # user_token['project_id']
+        #o_net = mongodb_client.db.overlays.find_one(
+        #    {'tenantid': tenantid, '_id': ObjectId(measurement_sessions_id)})
+        #return jsonify(EWUtil.id_to_string(o_net))
+        counter = 0
+        with open('datiMeasurementSessions.json', "r") as fileJson:
+            data = json.load(fileJson)
+        for elemento in data:
+            if(int(elemento['sessionId']) == int(measurement_sessions_id)):
+                counter = 1
+                return elemento
+        if(counter == 0):
+            return "Resource not found... no 'sessionId' matches 'id: " + measurement_sessions_id + "'"
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
+
+@bp.route('/<measurement_sessions_id>/results', methods=(['GET']))
+def get_measurement_sessions_results(measurement_sessions_id):
+    try:
+        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        # tenantid = user_token['project_id']
+        #tenantid = "1"  # user_token['project_id']
+        #o_net = mongodb_client.db.overlays.find_one(
+        #    {'tenantid': tenantid, '_id': ObjectId(measurement_sessions_id)})
+        #return jsonify(EWUtil.id_to_string(o_net))
+        counter = 0
+        with open('ResultsMeasurementSessions.json', "r") as fileJson:
             data = json.load(fileJson)
         for elemento in data:
             if(int(elemento['sessionId']) == int(measurement_sessions_id)):
