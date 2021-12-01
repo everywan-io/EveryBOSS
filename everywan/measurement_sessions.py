@@ -53,7 +53,7 @@ def list_measurement_sessions():
         abort(500, description=e.description)
 
 @bp.route('/<measurement_sessions_id>', methods=(['GET']))
-def get_measurement_sessions(measurement_sessions_id):
+def get_measurement_session(measurement_sessions_id):
     try:
         #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
@@ -79,11 +79,8 @@ def get_measurement_sessions(measurement_sessions_id):
     except ServerError as e:
         abort(500, description=e.description)
 
-s = {'type' : 'delay', 'direction' : 'both'}
-#+urllib.parse.urlencode(s)
-
-@bp.route('/<measurement_sessions_id>/details', methods=(['GET']))
-def get_measurement_sessions_details(measurement_sessions_id):
+@bp.route('/<measurement_sessions_id>', methods=(['PUT']))
+def run_stop_measurement_session(measurement_sessions_id):
     try:
         #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
@@ -91,15 +88,51 @@ def get_measurement_sessions_details(measurement_sessions_id):
         #o_net = mongodb_client.db.overlays.find_one(
         #    {'tenantid': tenantid, '_id': ObjectId(measurement_sessions_id)})
         #return jsonify(EWUtil.id_to_string(o_net))
-        counter = 0
-        with open('datiMeasurementSessions.json', "r") as fileJson:
-            data = json.load(fileJson)
-        for elemento in data:
-            if(int(elemento['sessionId']) == int(measurement_sessions_id)):
-                counter = 1
-                return elemento
-        if(counter == 0):
-            return "Resource not found... no 'sessionId' matches 'id: " + measurement_sessions_id + "'"
+        sessione = measurement_sessions_id;
+        return ("{}");
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
+
+@bp.route('/<measurement_sessions_id>', methods=(['DELETE']))
+def delete_measurement_session(measurement_sessions_id):
+    try:
+        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        #tenantid = user_token['project_id']
+        #tenantid = "1"  # user_token['project_id']
+        #code, reason = ctrl_nb_interface.remove_overlay(overlay_net_id, tenantid)
+        #if code == NbStatusCode.STATUS_INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+        #    raise ServerError(description=reason)
+        #elif code == NbStatusCode.STATUS_BAD_REQUEST:
+        #    raise BadRequest(description=reason)
+        #elif code == NbStatusCode.STATUS_UNAUTHORIZED:
+        #    raise Unauthorized(description=reason)
+        sessione = measurement_sessions_id;
+        return jsonify({});
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
+
+@bp.route('/', methods=(['POST']))
+def create_measurement_session():
+    try:
+        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        # tenantid = user_token['project_id']
+        #tenantid = "1"  # user_token['project_id']
+        #o_net = mongodb_client.db.overlays.find_one(
+        #    {'tenantid': tenantid, '_id': ObjectId(measurement_sessions_id)})
+        #return jsonify(EWUtil.id_to_string(o_net))
+        return ("{}");
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:

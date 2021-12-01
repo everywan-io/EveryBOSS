@@ -2,7 +2,7 @@
 	{
 	"sessionId": "101",
 	"sessionDescription": "session-101",
-	"status": "Running",
+	"status": "Stopped",
 	"senderDeviceId": "f92e6cda-47a0-3d52-3c9124f3ba7d5ab1",
 	"senderName": "ewED1",
 	"senderStampIp": "fcff:1::1",
@@ -19,7 +19,9 @@
 	"sidlist": ["fcff:3::1", "fcff:5::1", "fcff:7::1", "fcff:8::1"],
 	"returnSidlist": ["fcff:7::1", "fcff:5::1", "fcff:1::1", "fcff:1::1"],
 	"delayDirectPath": 34,
-	"delayReturnPath": 47
+	"delayReturnPath": 47,
+	"overlayId": "jsn2n36eshf634h",
+	"overlayName": "IpTV45" 
 	},
 	{
 	"sessionId" : "102",
@@ -41,7 +43,9 @@
 	"sidlist" : ["fcff:3::1", "fcff:7::1", "fcff:8::1"],
 	"returnSidlist" : ["fcff:7::1", "fcff:1::1", "fcff:1::1"],
 	"delayDirectPath" : 13,
-	"delayReturnPath" : 17
+	"delayReturnPath" : 17,
+	"overlayId": "jsn2n36eshf634h",
+	"overlayName": "IpTV45" 
 	},
 	{
 	"sessionId" : "103",
@@ -63,7 +67,9 @@
 	"sidlist" : ["fcff:3::1", "fcff:7::1", "fcff:8::1"],
 	"returnSidlist" : ["fcff:7::1", "fcff:1::1", "fcff:1::1"],
 	"delayDirectPath" : 13,
-	"delayReturnPath" : 17
+	"delayReturnPath" : 17,
+	"overlayId": "jsn2n36eshf634h",
+	"overlayName": "IpTV45"
 	}
 
 ]

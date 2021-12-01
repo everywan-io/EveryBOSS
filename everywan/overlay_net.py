@@ -131,7 +131,7 @@ def delete_overlay_net(overlay_net_id):
         abort(500, description=e.description)
 
 
-@bp.route('/<overlay_net_id>/slices', methods=(['post']))
+@bp.route('/<overlay_net_id>/slices', methods=(['POST']))
 def assign_slice_ovarlay(overlay_net_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
