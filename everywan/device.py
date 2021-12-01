@@ -26,23 +26,23 @@ from flask_cors import CORS
 from srv6_sdn_proto.status_codes_pb2 import NbStatusCode
 
 bp = Blueprint('devices', __name__, url_prefix='/devices')
-#authconn = KeystoneAuthConn()
+authconn = KeystoneAuthConn()
 
 
 @bp.route('/', methods=(['GET']))
 def list_devices():
     try:
-        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
-        #tenantid = "1"  # user_token['project_id']
-        #limit = request.args.get('limit', default=20, type=int)
-        #offset = request.args.get('offset', default=0, type=int)
-        #devices = mongodb_client.db.devices.find(
-        #    {'tenantid': tenantid}).skip(offset).limit(limit)
-        #return jsonify(EWUtil.mongo_cursor_to_json(devices))
-        with open('list_devices.json', "r") as fileJson:
-            list_devices = json.load(fileJson)
-        return jsonify(list_devices)
+        tenantid = "1"  # user_token['project_id']
+        limit = request.args.get('limit', default=20, type=int)
+        offset = request.args.get('offset', default=0, type=int)
+        devices = mongodb_client.db.devices.find(
+           {'tenantid': tenantid}).skip(offset).limit(limit)
+        return jsonify(EWUtil.mongo_cursor_to_json(devices))
+        # with open('list_devices.json', "r") as fileJson:
+        #     list_devices = json.load(fileJson)
+        # return jsonify(list_devices)
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
@@ -56,111 +56,111 @@ def list_devices():
 @bp.route('/interfaces', methods=(['GET']))
 def list_interfaces():
     try:
-        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        #interfaces = []
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        interfaces = []
         # tenantid = user_token['project_id']
-        #tenantid = "1"  # user_token['project_id']
+        tenantid = "1"  # user_token['project_id']
         # limit = request.args.get('limit', default=20, type=int)
         # offset = request.args.get('offset', default=0, type=int)
-        #available = request.args.get('available', default=False, type=bool)
+        available = request.args.get('available', default=False, type=bool)
 
-        #pipe_on_available = [
-        #    {
-        #        '$match': {
-        #            'enabled': True,
-        #            'connected': True,
-        #            'configured': True,
-        #            'tenantid': tenantid
-        #        }
-        #    }, {
-        #        '$unwind': {
-        #            'path': '$interfaces',
-        #            'preserveNullAndEmptyArrays': False
-        #        }
-        #    }, {
-        #        '$project': {
-        #            'device_name': '$name',
-        #            'name': '$interfaces.name',
-        #            'ipv4_addrs': '$interfaces.ipv4_addrs',
-        #            'type': '$interfaces.type',
-        #            'deviceid': '$deviceid',
-        #            'tenantid': '$tenantid'
-        #        }
-        #    }, {
-        #        '$match': {
-        #            'type': 'lan'
-        #        }
-        #    }, {
-        #        '$lookup': {
-        #            'from': 'overlays',
-        #            'let': {
-        #                'deviceid': '$deviceid',
-        #                'name': '$name',
-        #                'tenantid': '$tenantid'
-        #            },
-        #            'pipeline': [
-        #                {
-        #                    '$match': {
-        #                        '$expr': {
-        #                            '$eq': [
-        #                                '$tenantid', '$$tenantid'
-        #                            ]
-        #                        },
-        #                        '$expr': {
-        #                            '$and': [
-        #                                {
-        #                                    '$in': [
-        #                                        '$$name', '$slices.interface_name'
-        #                                    ]
-        #                                }
-        #                            ]
-        #                        }
-        #                    }
-        #                }
-        #            ],
-        #            'as': 'overlay'
-        #        }
-        #    }, {
-        #        '$match': {
-        #            '$expr': {
-        #                '$eq': [
-        #                    0, {
-        #                        '$size': '$overlay'
-        #                    }
-        #                ]
-        #            }
-        #        }
-        #    }
-        #]
-        #
-        #if available:
-        #    pipeline = pipe_on_available
-        #else:
-        #    pipeline = [
-        #        {
-        #            '$unwind': {
-        #                'path': '$interfaces',
-        #                'preserveNullAndEmptyArrays': False
-        #            }
-        #        },
-        #        {
-        #            '$project': {
-        #                'device_name': '$name',
-        #                'name': '$interfaces.name',
-        #                'ipv4_addrs': '$interfaces.ipv4_addrs',
-        #                'type': '$interfaces.type',
-        #                'deviceid': '$deviceid',
-        #                'tenantid': '$tenantid'
-        #            }
-        #        }
-        #    ]
-	#
-        #interfaces = mongodb_client.db.devices.aggregate(pipeline)
-        #interfaces = EWUtil.mongo_cursor_to_json(interfaces)
-        #return jsonify(interfaces)
-        with open('list_interfaces.json', "r") as fileJson:
-            list_interfaces = json.load(fileJson)
-        return jsonify(list_interfaces)
+        pipe_on_available = [
+           {
+               '$match': {
+                   'enabled': True,
+                   'connected': True,
+                   'configured': True,
+                   'tenantid': tenantid
+               }
+           }, {
+               '$unwind': {
+                   'path': '$interfaces',
+                   'preserveNullAndEmptyArrays': False
+               }
+           }, {
+               '$project': {
+                   'device_name': '$name',
+                   'name': '$interfaces.name',
+                   'ipv4_addrs': '$interfaces.ipv4_addrs',
+                   'type': '$interfaces.type',
+                   'deviceid': '$deviceid',
+                   'tenantid': '$tenantid'
+               }
+           }, {
+               '$match': {
+                   'type': 'lan'
+               }
+           }, {
+               '$lookup': {
+                   'from': 'overlays',
+                   'let': {
+                       'deviceid': '$deviceid',
+                       'name': '$name',
+                       'tenantid': '$tenantid'
+                   },
+                   'pipeline': [
+                       {
+                           '$match': {
+                               '$expr': {
+                                   '$eq': [
+                                       '$tenantid', '$$tenantid'
+                                   ]
+                               },
+                               '$expr': {
+                                   '$and': [
+                                       {
+                                           '$in': [
+                                               '$$name', '$slices.interface_name'
+                                           ]
+                                       }
+                                   ]
+                               }
+                           }
+                       }
+                   ],
+                   'as': 'overlay'
+               }
+           }, {
+               '$match': {
+                   '$expr': {
+                       '$eq': [
+                           0, {
+                               '$size': '$overlay'
+                           }
+                       ]
+                   }
+               }
+           }
+        ]
+        
+        if available:
+           pipeline = pipe_on_available
+        else:
+           pipeline = [
+               {
+                   '$unwind': {
+                       'path': '$interfaces',
+                       'preserveNullAndEmptyArrays': False
+                   }
+               },
+               {
+                   '$project': {
+                       'device_name': '$name',
+                       'name': '$interfaces.name',
+                       'ipv4_addrs': '$interfaces.ipv4_addrs',
+                       'type': '$interfaces.type',
+                       'deviceid': '$deviceid',
+                       'tenantid': '$tenantid'
+                   }
+               }
+           ]
+	
+        interfaces = mongodb_client.db.devices.aggregate(pipeline)
+        interfaces = EWUtil.mongo_cursor_to_json(interfaces)
+        return jsonify(interfaces)
+        # with open('list_interfaces.json', "r") as fileJson:
+        #     list_interfaces = json.load(fileJson)
+        # return jsonify(list_interfaces)
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
@@ -174,17 +174,17 @@ def list_interfaces():
 @bp.route('/<device_id>', methods=(['GET']))
 def get_device(device_id):
     try:
-        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         # tenantid = user_token['project_id']
-        #tenantid = "1"  # user_token['project_id']
-        #device = mongodb_client.db.devices.find_one(
-        #    {'deviceid': device_id, 'tenantid': tenantid}, {'_id': 0})
-        #if not device:
-        #    raise ResourceNotFound
-        #return jsonify(device)
-        with open('get_device.json', "r") as fileJson:
-            devices = json.load(fileJson)
-        return jsonify(devices)
+        tenantid = "1"  # user_token['project_id']
+        device = mongodb_client.db.devices.find_one(
+           {'deviceid': device_id, 'tenantid': tenantid}, {'_id': 0})
+        if not device:
+           raise ResourceNotFound
+        return jsonify(device)
+        # with open('get_device.json', "r") as fileJson:
+        #     devices = json.load(fileJson)
+        # return jsonify(devices)
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:

@@ -17,17 +17,18 @@ from flask import (
 )
 from bson.objectid import ObjectId
 from everywan import mongodb_client, ctrl_nb_interface
-from everywan.error_handler import Unauthorized, BadRequest, ServerError
+from everywan.error_handler import Unauthorized, BadRequest, ServerError, ResourceNotFound
 from everywan.keystone.authconn import KeystoneAuthConn
 import everywan.utils as EWUtil
 import json
 import urllib
 from srv6_sdn_proto.status_codes_pb2 import NbStatusCode
+from srv6_sdn_control_plane.northbound.grpc.nb_grpc_client import STAMPError
 
 # from everywan.db import get_db
 
 bp = Blueprint('measurement_sessions', __name__, url_prefix='/measurement_sessions')
-#authconn = KeystoneAuthConn()
+authconn = KeystoneAuthConn()
 
 @bp.route('/', methods=(['GET']))
 def list_measurement_sessions():
@@ -40,9 +41,42 @@ def list_measurement_sessions():
         #o_nets = mongodb_client.db.measurement.find(
         #    {'tenantid': tenantid}).skip(offset).limit(limit)
         #return jsonify(EWUtil.mongo_cursor_to_json(o_nets))
-        with open('datiMeasurementSessions.json', "r") as fileJson:
-            data = json.load(fileJson)
-        return jsonify(data)
+
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        request_dict = request.json
+        try:
+            sessions = ctrl_nb_interface.get_stamp_sessions()
+        except STAMPError as err:
+            raise BadRequest(description=err)
+        return jsonify([{
+            'sessionId': session['ssid'],
+            'sessionDescription': session['description'],
+            'senderName': session['sender_name'],
+            'reflectorName': session['reflector_name'],
+            'status': session['status'],
+            'delayDirectPath': session['average_delay_direct_path'],
+            'delayReturnPath': session['average_delay_return_path'],
+            'interval': session['interval'],
+            'authenticationMode': session['auth_mode'].capitalize(),
+            'keyChain': session['key_chain'] if session['key_chain'] != '' else None,
+            'timestampFormat': session['timestamp_format'].upper(),
+            'delayMeasurementMode': session['delay_measurement_mode'].capitalize().replace('-', ' '),
+            'sessionReflectorMode': session['session_reflector_mode'].capitalize(),
+            'senderDeviceId': session['sender_id'],
+            'senderStampIp': session['sender_source_ip'],
+            'reflectorDeviceId': session['reflector_id'],
+            'reflectorStampIp': session['reflector_source_ip'],
+            'sidlist': session['direct_sidlist'],
+            'returnSidlist': session['return_sidlist'],
+            'results': '',
+            'overlayId': '',
+            'overlayName': ''
+            } for session in sessions]
+        )
+        
+        #with open('datiMeasurementSessions.json', "r") as fileJson:
+        #    data = json.load(fileJson)
+        #return jsonify(data)
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
@@ -61,21 +95,59 @@ def get_measurement_session(measurement_sessions_id):
         #o_net = mongodb_client.db.overlays.find_one(
         #    {'tenantid': tenantid, '_id': ObjectId(measurement_sessions_id)})
         #return jsonify(EWUtil.id_to_string(o_net))
-        counter = 0
-        with open('datiMeasurementSessions.json', "r") as fileJson:
-            data = json.load(fileJson)
-        for elemento in data:
-            if(int(elemento['sessionId']) == int(measurement_sessions_id)):
-                counter = 1
-                return elemento
-        if(counter == 0):
-            return "Resource not found... no 'sessionId' matches 'id: " + measurement_sessions_id + "'"
+
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        request_dict = request.json
+        try:
+            sessions = ctrl_nb_interface.get_stamp_sessions(ssid=int(measurement_sessions_id))
+            if len(sessions) == 0:
+                raise ResourceNotFound
+        except STAMPError as err:
+            raise BadRequest(description=err)
+        session = sessions[0]
+        return jsonify({
+            'sessionId': session['ssid'],
+            'sessionDescription': session['description'],
+            'senderName': session['sender_name'],
+            'reflectorName': session['reflector_name'],
+            'status': session['status'],
+            'delayDirectPath': session['average_delay_direct_path'],
+            'delayReturnPath': session['average_delay_return_path'],
+            'interval': session['interval'],
+            'authenticationMode': session['auth_mode'].capitalize(),
+            'keyChain': session['key_chain'] if session['key_chain'] != '' else None,
+            'timestampFormat': session['timestamp_format'].upper(),
+            'delayMeasurementMode': session['delay_measurement_mode'].capitalize().replace('-', ' '),
+            'sessionReflectorMode': session['session_reflector_mode'].capitalize(),
+            'senderDeviceId': session['sender_id'],
+            'senderStampIp': session['sender_source_ip'],
+            'reflectorDeviceId': session['reflector_id'],
+            'reflectorStampIp': session['reflector_source_ip'],
+            'sidlist': session['direct_sidlist'],
+            'returnSidlist': session['return_sidlist'],
+            'results': '',
+            'overlayId': '',
+            'overlayName': ''
+            }
+        )
+
+        # counter = 0
+        # with open('datiMeasurementSessions.json', "r") as fileJson:
+        #     data = json.load(fileJson)
+        # for elemento in data:
+        #     if(int(elemento['sessionId']) == int(measurement_sessions_id)):
+        #         counter = 1
+        #         return elemento
+        # if(counter == 0):
+        #     return "Resource not found... no 'sessionId' matches 'id: " + measurement_sessions_id + "'"
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
         abort(400, description=e.description)
     except Unauthorized as e:
         abort(401, description=e.description)
+    except ResourceNotFound as e:
+        abort(404, description=e.description)
     except ServerError as e:
         abort(500, description=e.description)
 
@@ -88,8 +160,21 @@ def run_stop_measurement_session(measurement_sessions_id):
         #o_net = mongodb_client.db.overlays.find_one(
         #    {'tenantid': tenantid, '_id': ObjectId(measurement_sessions_id)})
         #return jsonify(EWUtil.id_to_string(o_net))
-        sessione = measurement_sessions_id;
-        return ("{}");
+
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        command = request.args.get('command')
+        try:
+            if command == 'start':
+                ctrl_nb_interface.start_stamp_session(ssid=int(measurement_sessions_id))
+            elif command == 'stop':
+                ctrl_nb_interface.stop_stamp_session(ssid=int(measurement_sessions_id))
+        except STAMPError as err:
+            raise BadRequest(description=err)
+
+        return ("{}")
+
+        #sessione = measurement_sessions_id;
+        #return ("{}");
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
@@ -112,8 +197,16 @@ def delete_measurement_session(measurement_sessions_id):
         #    raise BadRequest(description=reason)
         #elif code == NbStatusCode.STATUS_UNAUTHORIZED:
         #    raise Unauthorized(description=reason)
-        sessione = measurement_sessions_id;
-        return jsonify({});
+
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        try:
+            ctrl_nb_interface.destroy_stamp_session(ssid=int(measurement_sessions_id))
+        except STAMPError as err:
+            raise BadRequest(description=err)
+
+        return jsonify({})
+        # sessione = measurement_sessions_id;
+        # return jsonify({});
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
@@ -132,6 +225,65 @@ def create_measurement_session():
         #o_net = mongodb_client.db.overlays.find_one(
         #    {'tenantid': tenantid, '_id': ObjectId(measurement_sessions_id)})
         #return jsonify(EWUtil.id_to_string(o_net))
+
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        request_dict = request.json
+        sender_id = request_dict.get('sessionSenderDeviceId', None)
+        reflector_id = request_dict.get('sessionReflectorDeviceId', None)
+        direct_sidlist = request_dict.get('sidlist', None)
+        if direct_sidlist is not None:
+            direct_sidlist = direct_sidlist.split(',')
+        return_sidlist = request_dict.get('returnSidlist', None)
+        if return_sidlist is not None:
+            return_sidlist = return_sidlist.split(',')
+        interval = request_dict.get('interval', None)
+        auth_mode = request_dict.get('authenticationMode', None)
+        if auth_mode is not None:
+            auth_mode = auth_mode.lower()
+        key_chain = request_dict.get('keyChain', None)
+        timestamp_format = request_dict.get('timestampFormat', None)
+        if timestamp_format is not None:
+            timestamp_format = timestamp_format.lower()
+        #packet_loss_type = request_dict.get('', None)
+        packet_loss_type = None
+        delay_measurement_mode = request_dict.get('delayMeasurementMode', None)
+        if delay_measurement_mode is not None:
+            delay_measurement_mode = delay_measurement_mode.lower().replace(' ', '-')
+        session_reflector_mode = request_dict.get('sessionReflectorMode', None)
+        if session_reflector_mode is not None:
+            session_reflector_mode = session_reflector_mode.lower()
+        #sender_source_ip = request_dict.get('', None)
+        sender_source_ip = None
+        #reflector_source_ip = request_dict.get('', None)
+        reflector_source_ip = None
+        #description = request_dict.get('', None)
+        description = None
+        duration = request_dict.get('duration', 0)
+        if duration is None:
+            duration = 0
+        #overlayName
+        #overlaySession
+        #sessionSender
+        #sessionReflector
+        #runOptions
+
+        try:
+            ctrl_nb_interface.create_stamp_session(
+                sender_id=sender_id,
+                reflector_id=reflector_id,
+                direct_sidlist=direct_sidlist, return_sidlist=return_sidlist,
+                interval=interval, auth_mode=auth_mode,
+                key_chain=key_chain, timestamp_format=timestamp_format,
+                packet_loss_type=packet_loss_type,
+                delay_measurement_mode=delay_measurement_mode,
+                session_reflector_mode=session_reflector_mode,
+                sender_source_ip=sender_source_ip,
+                reflector_source_ip=reflector_source_ip, description=description,
+                duration=duration
+            )
+        except STAMPError as err:
+            raise BadRequest(description=err)
+
         return ("{}");
     except KeyError as e:
         abort(400, description=e)
@@ -151,20 +303,59 @@ def get_measurement_sessions_results(measurement_sessions_id):
         #o_net = mongodb_client.db.overlays.find_one(
         #    {'tenantid': tenantid, '_id': ObjectId(measurement_sessions_id)})
         #return jsonify(EWUtil.id_to_string(o_net))
-        counter = 0
-        with open('ResultsMeasurementSessions.json', "r") as fileJson:
-            data = json.load(fileJson)
-        for elemento in data:
-            if(int(elemento['sessionId']) == int(measurement_sessions_id)):
-                counter = 1
-                return elemento
-        if(counter == 0):
-            return "Resource not found... no 'sessionId' matches 'id: " + measurement_sessions_id + "'"
+        
+        
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        request_dict = request.json
+        try:
+            results = ctrl_nb_interface.get_stamp_results(ssid=int(measurement_sessions_id))
+            if len(results) == 0:
+                raise ResourceNotFound
+        except STAMPError as err:
+            raise BadRequest(description=err)
+        result = results[0]
+        return jsonify({
+            'sessionId': result['ssid'],
+            'sidlist': result['direct_sidlist'],
+            'returnSidlist': result['return_sidlist'],
+            'type': result['measurement_type'],
+            'direction': result['measurement_direction'],
+            'results': {
+                'delayDirectPath': {
+                    'delays': [{
+                        'id': delay['id'],
+                        'timestamp': delay['timestamp'],
+                        'value': delay['value']
+                    } for delay in result['results']['direct_path']['delays']],
+                    'averageDelay': result['results']['direct_path']['average_delay'],
+                },
+                'delayReturnPath': {
+                    'delays': [{
+                        'id': delay['id'],
+                        'timestamp': delay['timestamp'],
+                        'value': delay['value']
+                    } for delay in result['results']['return_path']['delays']],
+                    'averageDelay': result['results']['return_path']['average_delay'],
+                },
+            }
+        })
+
+        # counter = 0
+        # with open('ResultsMeasurementSessions.json', "r") as fileJson:
+        #     data = json.load(fileJson)
+        # for elemento in data:
+        #     if(int(elemento['sessionId']) == int(measurement_sessions_id)):
+        #         counter = 1
+        #         return elemento
+        # if(counter == 0):
+        #     return "Resource not found... no 'sessionId' matches 'id: " + measurement_sessions_id + "'"
     except KeyError as e:
         abort(400, description=e)
     except BadRequest as e:
         abort(400, description=e.description)
     except Unauthorized as e:
         abort(401, description=e.description)
+    except ResourceNotFound as e:
+        abort(404, description=e.description)
     except ServerError as e:
         abort(500, description=e.description)
