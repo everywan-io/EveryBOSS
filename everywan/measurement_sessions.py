@@ -47,13 +47,13 @@ def list_measurement_sessions():
         try:
             sessions = ctrl_nb_interface.get_stamp_sessions()
         except STAMPError as err:
-            raise BadRequest(description=err)
+            raise BadRequest(description=err.msg)
         return jsonify([{
             'sessionId': session['ssid'],
             'sessionDescription': session['description'],
             'senderName': session['sender_name'],
             'reflectorName': session['reflector_name'],
-            'status': session['status'],
+            'status': session['status'].capitalize(),
             'delayDirectPath': session['average_delay_direct_path'],
             'delayReturnPath': session['average_delay_return_path'],
             'interval': session['interval'],
@@ -103,14 +103,14 @@ def get_measurement_session(measurement_sessions_id):
             if len(sessions) == 0:
                 raise ResourceNotFound
         except STAMPError as err:
-            raise BadRequest(description=err)
+            raise BadRequest(description=err.msg)
         session = sessions[0]
         return jsonify({
             'sessionId': session['ssid'],
             'sessionDescription': session['description'],
             'senderName': session['sender_name'],
             'reflectorName': session['reflector_name'],
-            'status': session['status'],
+            'status': session['status'].capitalize(),
             'delayDirectPath': session['average_delay_direct_path'],
             'delayReturnPath': session['average_delay_return_path'],
             'interval': session['interval'],
@@ -162,14 +162,18 @@ def run_stop_measurement_session(measurement_sessions_id):
         #return jsonify(EWUtil.id_to_string(o_net))
 
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        command = request.args.get('command')
+        request_dict = request.json
+        command = request_dict.get('command', None)
+
         try:
             if command == 'start':
                 ctrl_nb_interface.start_stamp_session(ssid=int(measurement_sessions_id))
             elif command == 'stop':
                 ctrl_nb_interface.stop_stamp_session(ssid=int(measurement_sessions_id))
+            else:
+                raise BadRequest(description=f'Invalid command: {command}')
         except STAMPError as err:
-            raise BadRequest(description=err)
+            raise BadRequest(description=err.msg)
 
         return ("{}")
 
@@ -202,7 +206,7 @@ def delete_measurement_session(measurement_sessions_id):
         try:
             ctrl_nb_interface.destroy_stamp_session(ssid=int(measurement_sessions_id))
         except STAMPError as err:
-            raise BadRequest(description=err)
+            raise BadRequest(description=err.msg)
 
         return jsonify({})
         # sessione = measurement_sessions_id;
@@ -265,7 +269,8 @@ def create_measurement_session():
         #overlaySession
         #sessionSender
         #sessionReflector
-        #runOptions
+        run_after_creation = request_dict.get('runOptions', 'no').lower()
+        run_after_creation = True if run_after_creation == 'yes' else False
 
         try:
             ctrl_nb_interface.create_stamp_session(
@@ -279,10 +284,11 @@ def create_measurement_session():
                 session_reflector_mode=session_reflector_mode,
                 sender_source_ip=sender_source_ip,
                 reflector_source_ip=reflector_source_ip, description=description,
-                duration=duration
+                duration=duration,
+                start_after_creation=run_after_creation
             )
         except STAMPError as err:
-            raise BadRequest(description=err)
+            raise BadRequest(description=err.msg)
 
         return ("{}");
     except KeyError as e:
@@ -312,7 +318,7 @@ def get_measurement_sessions_results(measurement_sessions_id):
             if len(results) == 0:
                 raise ResourceNotFound
         except STAMPError as err:
-            raise BadRequest(description=err)
+            raise BadRequest(description=err.msg)
         result = results[0]
         return jsonify({
             'sessionId': result['ssid'],
