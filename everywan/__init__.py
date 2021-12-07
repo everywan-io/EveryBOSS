@@ -19,7 +19,8 @@ from flask_pymongo import PyMongo
 from .error_handler import init_errorhandler
 from srv6_sdn_control_plane.northbound.grpc import nb_grpc_client
 
-DEFAULT_CONTROLLER_IP = '11.4.128.141'
+#DEFAULT_CONTROLLER_IP = '11.4.128.141'
+DEFAULT_CONTROLLER_IP = 'debian-ipv6.netgroup.uniroma2.it'
 DEFAULT_CONTROLLER_PORT = 54321
 
 mongodb_client = PyMongo()
