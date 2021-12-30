@@ -365,3 +365,48 @@ def get_measurement_sessions_results(measurement_sessions_id):
         abort(404, description=e.description)
     except ServerError as e:
         abort(500, description=e.description)
+
+
+@bp.route('/sidlists', methods=(['GET']))
+def get_sid_lists():
+    try:
+        #user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        # tenantid = user_token['project_id']
+        #tenantid = "1"  # user_token['project_id']
+        #limit = request.args.get('limit', default=20, type=int)
+        #offset = request.args.get('offset', default=0, type=int)
+        #o_nets = mongodb_client.db.measurement.find(
+        #    {'tenantid': tenantid}).skip(offset).limit(limit)
+        #return jsonify(EWUtil.mongo_cursor_to_json(o_nets))
+
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        tenantid = '1'  # user_token['project_id']
+        print('req', request.args)
+        sender_id = request.args.get('senderId', type=str)
+        reflector_id = request.args.get('reflectorId', type=str)
+        if sender_id is None:
+            raise BadRequest(description='Missing mandatory param "senderId"')
+        if reflector_id is None:
+            raise BadRequest(description='Missing mandatory param "reflectorId"')
+        code, reason, sid_lists = ctrl_nb_interface.get_sid_lists(
+            ingress_deviceid=sender_id, egress_deviceid=reflector_id,
+            tenantid=tenantid)
+        if code == NbStatusCode.STATUS_INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+            raise ServerError(description=reason)
+        elif code == NbStatusCode.STATUS_BAD_REQUEST:
+            raise BadRequest(description=reason)
+        elif code == NbStatusCode.STATUS_UNAUTHORIZED:
+            raise Unauthorized(description=reason)
+        return jsonify(sid_lists)
+        
+        #with open('datiMeasurementSessions.json', "r") as fileJson:
+        #    data = json.load(fileJson)
+        #return jsonify(data)
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
