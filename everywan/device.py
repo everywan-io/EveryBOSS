@@ -37,8 +37,16 @@ def list_devices():
         tenantid = "1"  # user_token['project_id']
         limit = request.args.get('limit', default=20, type=int)
         offset = request.args.get('offset', default=0, type=int)
-        devices = mongodb_client.db.devices.find(
-           {'tenantid': tenantid}).skip(offset).limit(limit)
+        
+        available = request.args.get('available', default=False, type=bool)
+
+        query = {'tenantid': tenantid}
+        if available:
+            query['enabled'] = True
+            query['connected'] = True
+            query['configured'] = True
+
+        devices = mongodb_client.db.devices.find(query).skip(offset).limit(limit)
         return jsonify(EWUtil.mongo_cursor_to_json(devices))
         # with open('list_devices.json', "r") as fileJson:
         #     list_devices = json.load(fileJson)
