@@ -90,6 +90,7 @@ def list_interfaces():
                    'device_name': '$name',
                    'name': '$interfaces.name',
                    'ipv4_addrs': '$interfaces.ipv4_addrs',
+                   'ipv6_addrs': '$interfaces.ipv6_addrs',
                    'type': '$interfaces.type',
                    'deviceid': '$deviceid',
                    'tenantid': '$tenantid'
@@ -156,6 +157,7 @@ def list_interfaces():
                        'device_name': '$name',
                        'name': '$interfaces.name',
                        'ipv4_addrs': '$interfaces.ipv4_addrs',
+                       'ipv6_addrs': '$interfaces.ipv6_addrs',
                        'type': '$interfaces.type',
                        'deviceid': '$deviceid',
                        'tenantid': '$tenantid'
