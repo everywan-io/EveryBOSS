@@ -290,3 +290,28 @@ def disable_device(device_id):
         abort(401, description=e.description)
     except ServerError as e:
         abort(500, description=e.description)
+
+
+@bp.route('/<device_id>/delete', methods=(['POST']))
+def delete_device(device_id):
+    try:
+        user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        # tenantid = user_token['project_id']
+        tenantid = "1"  # user_token['project_id']
+        code, reason = ctrl_nb_interface.unregister_device(
+            deviceid=device_id, tenantid=tenantid)
+        if code == NbStatusCode.STATUS_INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
+            raise ServerError(description=reason)
+        elif code == NbStatusCode.STATUS_BAD_REQUEST:
+            raise BadRequest(description=reason)
+        elif code == NbStatusCode.STATUS_UNAUTHORIZED:
+            raise Unauthorized(description=reason)
+        return jsonify({})
+    except KeyError as e:
+        abort(400, description=e)
+    except BadRequest as e:
+        abort(400, description=e.description)
+    except Unauthorized as e:
+        abort(401, description=e.description)
+    except ServerError as e:
+        abort(500, description=e.description)
