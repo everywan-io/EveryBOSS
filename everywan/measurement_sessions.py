@@ -381,7 +381,6 @@ def get_sid_lists():
 
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         tenantid = '1'  # user_token['project_id']
-        print('req', request.args)
         sender_id = request.args.get('senderId', type=str)
         reflector_id = request.args.get('reflectorId', type=str)
         if sender_id is None:
