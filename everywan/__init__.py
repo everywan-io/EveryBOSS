@@ -21,7 +21,7 @@ from srv6_sdn_control_plane.northbound.grpc import nb_grpc_client
 
 DEFAULT_CONTROLLER_IP = os.environ.get('CONTROLLER_IP', '127.0.0.1')
 DEFAULT_CONTROLLER_PORT = int(os.environ.get('CONTROLLER_PORT', 54321))
-KEYSTONE_IP = os.environ.get('KEYSTONE_IP', '0.0.0.0')
+KEYSTONE_HOST = os.environ.get('KEYSTONE_HOST', '0.0.0.0')
 
 mongodb_client = PyMongo()
 ctrl_nb_interface = nb_grpc_client.NorthboundInterface(
