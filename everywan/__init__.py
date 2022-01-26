@@ -27,7 +27,7 @@ KEYSTONE_PORT = int(os.environ.get('KEYSTONE_PORT', 35357))
 MONGODB_HOST = os.environ.get('MONGODB_HOST', 'localhost')
 MONGODB_PORT = int(os.environ.get('MONGODB_PORT', 27017))
 MONGODB_USERNAME = os.environ.get('MONGODB_USERNAME', 'root')
-MONGODB_PASSWORD = int(os.environ.get('MONGODB_PASSWORD', '12345678'))
+MONGODB_PASSWORD = os.environ.get('MONGODB_PASSWORD', '12345678')
 
 mongodb_client = PyMongo()
 ctrl_nb_interface = nb_grpc_client.NorthboundInterface(
