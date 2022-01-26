@@ -51,7 +51,7 @@ def create_app(test_config=None):
     )
     CORS(app, resources={r"/.*": {"origins": "*"}})
     app.config['CORS_HEADERS'] = 'Content-Type'
-    app.config["MONGO_URI"] = "mongodb://" + MONGODB_USERNAME + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + ":" + MONGODB_PORT + "/EveryWan?authSource=admin&readPreference=primary&appname=NBI&ssl=false"
+    app.config["MONGO_URI"] = "mongodb://" + MONGODB_USERNAME + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + ":" + str(MONGODB_PORT) + "/EveryWan?authSource=admin&readPreference=primary&appname=NBI&ssl=false"
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)

@@ -26,7 +26,7 @@ class KeystoneAuthConn:
     def __init__(self, config=None):
         self.logger = logging.getLogger("KeystoneAuthConn")
         self.config = config
-        self.auth_url = "http://" + KEYSTONE_HOST + ":" + KEYSTONE_PORT + "/v3"
+        self.auth_url = "http://" + KEYSTONE_HOST + ":" + str(KEYSTONE_PORT) + "/v3"
         self.endpoint = "http://" + KEYSTONE_HOST + ":35357/v3"
         self.admin_user_domain_name = "Default"
         self.admin_project_name = "admin"
