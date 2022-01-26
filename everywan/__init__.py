@@ -22,6 +22,12 @@ from srv6_sdn_control_plane.northbound.grpc import nb_grpc_client
 DEFAULT_CONTROLLER_IP = os.environ.get('CONTROLLER_IP', '127.0.0.1')
 DEFAULT_CONTROLLER_PORT = int(os.environ.get('CONTROLLER_PORT', 54321))
 KEYSTONE_HOST = os.environ.get('KEYSTONE_HOST', '0.0.0.0')
+KEYSTONE_PORT = int(os.environ.get('KEYSTONE_PORT', 35357))
+
+MONGODB_HOST = os.environ.get('MONGODB_HOST', 'localhost')
+MONGODB_PORT = int(os.environ.get('MONGODB_PORT', 27017))
+MONGODB_USERNAME = os.environ.get('MONGODB_USERNAME', 'root')
+MONGODB_PASSWORD = int(os.environ.get('MONGODB_PASSWORD', '12345678'))
 
 mongodb_client = PyMongo()
 ctrl_nb_interface = nb_grpc_client.NorthboundInterface(
@@ -45,7 +51,7 @@ def create_app(test_config=None):
     )
     CORS(app, resources={r"/.*": {"origins": "*"}})
     app.config['CORS_HEADERS'] = 'Content-Type'
-    app.config["MONGO_URI"] = "mongodb://root:12345678@localhost:27017/EveryWan?authSource=admin&readPreference=primary&appname=NBI&ssl=false"
+    app.config["MONGO_URI"] = "mongodb://" + MONGODB_USERNAME + ":" + MONGODB_PASSWORD + "@" + MONGODB_HOST + ":" + MONGODB_PORT + "/EveryWan?authSource=admin&readPreference=primary&appname=NBI&ssl=false"
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)

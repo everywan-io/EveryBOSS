@@ -17,7 +17,7 @@ from keystoneauth1 import session
 from keystoneclient.v3 import client
 from http import HTTPStatus
 from everywan.error_handler import Unauthorized
-from everywan import KEYSTONE_HOST
+from everywan import KEYSTONE_HOST, KEYSTONE_PORT
 import logging
 
 
@@ -26,7 +26,8 @@ class KeystoneAuthConn:
     def __init__(self, config=None):
         self.logger = logging.getLogger("KeystoneAuthConn")
         self.config = config
-        self.auth_url = "http://" + KEYSTONE_HOST + ":5000/v3"
+        self.auth_url = "http://" + KEYSTONE_HOST + ":" + KEYSTONE_PORT + "/v3"
+        self.endpoint = "http://" + KEYSTONE_HOST + ":35357/v3"
         self.admin_user_domain_name = "Default"
         self.admin_project_name = "admin"
         self.admin_username = "admin"
@@ -35,7 +36,7 @@ class KeystoneAuthConn:
         self.auth = v3.Password(auth_url=self.auth_url, username=self.admin_username, password=self.admin_password, project_domain_name=self.admin_project_domain_name,
                                 project_name=self.admin_project_name, user_domain_name=self.admin_user_domain_name)
         self.sess = session.Session(auth=self.auth)
-        self.keystone = client.Client(session=self.sess)
+        self.keystone = client.Client(session=self.sess, endpoint=self.endpoint)
 
     def authenticate(self, user_name, password, project_id=None, domain=None):
         """
