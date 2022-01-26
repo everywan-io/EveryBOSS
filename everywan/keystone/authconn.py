@@ -36,7 +36,7 @@ class KeystoneAuthConn:
         self.auth = v3.Password(auth_url=self.auth_url, username=self.admin_username, password=self.admin_password, project_domain_name=self.admin_project_domain_name,
                                 project_name=self.admin_project_name, user_domain_name=self.admin_user_domain_name)
         self.sess = session.Session(auth=self.auth)
-        self.keystone = client.Client(session=self.sess, endpoint=self.endpoint)
+        self.keystone = client.Client(session=self.sess, endpoint=self.endpoint, endpoint_override=self.endpoint)
 
     def authenticate(self, user_name, password, project_id=None, domain=None):
         """
