@@ -241,6 +241,10 @@ def create_measurement_session():
         if return_sidlist is not None:
             return_sidlist = return_sidlist.split(',')
         interval = request_dict.get('interval', None)
+        if not (interval > 0):
+            raise BadRequest(description='Interval must be greater than 0')
+        if interval != int(interval):
+            raise BadRequest(description='Interval must be an integer')
         auth_mode = request_dict.get('authenticationMode', None)
         if auth_mode is not None:
             auth_mode = auth_mode.lower()
@@ -265,6 +269,10 @@ def create_measurement_session():
         duration = request_dict.get('duration', 0)
         if duration is None:
             duration = 0
+        if duration < 0:
+            raise BadRequest(description='Duration value cannot be negative')
+        if duration != int(duration):
+            raise BadRequest(description='Duration must be an integer')
         #overlayName
         #overlaySession
         #sessionSender
