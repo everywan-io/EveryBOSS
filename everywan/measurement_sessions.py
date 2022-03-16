@@ -44,9 +44,10 @@ def list_measurement_sessions():
         #return jsonify(EWUtil.mongo_cursor_to_json(o_nets))
 
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        tenantid = user_token['project_id']
         request_dict = request.json
         try:
-            sessions = ctrl_nb_interface.get_stamp_sessions()
+            sessions = ctrl_nb_interface.get_stamp_sessions(tenantid=tenantid)
         except STAMPError as err:
             raise BadRequest(description=err.msg)
         return jsonify([{
@@ -98,9 +99,12 @@ def get_measurement_session(measurement_sessions_id):
         #return jsonify(EWUtil.id_to_string(o_net))
 
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        tenantid = user_token['project_id']
         request_dict = request.json
         try:
-            sessions = ctrl_nb_interface.get_stamp_sessions(ssid=int(measurement_sessions_id))
+            sessions = ctrl_nb_interface.get_stamp_sessions(
+                ssid=int(measurement_sessions_id), tenantid=tenantid
+            )
             if len(sessions) == 0:
                 raise ResourceNotFound
         except STAMPError as err:
@@ -163,14 +167,19 @@ def run_stop_measurement_session(measurement_sessions_id):
         #return jsonify(EWUtil.id_to_string(o_net))
 
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        tenantid = user_token['project_id']
         request_dict = request.json
         command = request_dict.get('command', None)
 
         try:
             if command == 'start':
-                ctrl_nb_interface.start_stamp_session(ssid=int(measurement_sessions_id))
+                ctrl_nb_interface.start_stamp_session(
+                    ssid=int(measurement_sessions_id), tenantid=tenantid
+                )
             elif command == 'stop':
-                ctrl_nb_interface.stop_stamp_session(ssid=int(measurement_sessions_id))
+                ctrl_nb_interface.stop_stamp_session(
+                    ssid=int(measurement_sessions_id), tenantid=tenantid
+                )
             else:
                 raise BadRequest(description=f'Invalid command: {command}')
         except STAMPError as err:
@@ -204,8 +213,11 @@ def delete_measurement_session(measurement_sessions_id):
         #    raise Unauthorized(description=reason)
 
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        tenantid = user_token['project_id']
         try:
-            ctrl_nb_interface.destroy_stamp_session(ssid=int(measurement_sessions_id))
+            ctrl_nb_interface.destroy_stamp_session(
+                ssid=int(measurement_sessions_id), tenantid=tenantid
+            )
         except STAMPError as err:
             raise BadRequest(description=err.msg)
 
@@ -232,6 +244,7 @@ def create_measurement_session():
         #return jsonify(EWUtil.id_to_string(o_net))
 
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        tenantid = user_token['project_id']
         request_dict = request.json
         sender_id = request_dict.get('sessionSenderDeviceId', None)
         reflector_id = request_dict.get('sessionReflectorDeviceId', None)
@@ -294,7 +307,8 @@ def create_measurement_session():
                 sender_source_ip=sender_source_ip,
                 reflector_source_ip=reflector_source_ip, description=description,
                 duration=duration,
-                start_after_creation=run_after_creation
+                start_after_creation=run_after_creation,
+                tenantid=tenantid
             )
         except STAMPError as err:
             raise BadRequest(description=err.msg)
@@ -321,9 +335,12 @@ def get_measurement_sessions_results(measurement_sessions_id):
         
         
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
+        tenantid = user_token['project_id']
         request_dict = request.json
         try:
-            results = ctrl_nb_interface.get_stamp_results(ssid=int(measurement_sessions_id))
+            results = ctrl_nb_interface.get_stamp_results(
+                ssid=int(measurement_sessions_id), tenantid=tenantid
+            )
             if len(results) == 0:
                 raise ResourceNotFound
         except STAMPError as err:
@@ -389,7 +406,8 @@ def get_sid_lists():
         #return jsonify(EWUtil.mongo_cursor_to_json(o_nets))
 
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        tenantid = '1'  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = '1'  # user_token['project_id']
         sender_id = request.args.get('senderId', type=str)
         reflector_id = request.args.get('reflectorId', type=str)
         if sender_id is None:

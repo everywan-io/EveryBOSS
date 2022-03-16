@@ -33,8 +33,8 @@ authconn = KeystoneAuthConn()
 def list_overlay_nets():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         limit = request.args.get('limit', default=20, type=int)
         offset = request.args.get('offset', default=0, type=int)
         o_nets = mongodb_client.db.overlays.find(
@@ -57,8 +57,8 @@ def list_overlay_nets():
 def get_overlay_net(overlay_net_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         o_net = mongodb_client.db.overlays.find_one(
            {'tenantid': tenantid, '_id': ObjectId(overlay_net_id)})
         return jsonify(EWUtil.id_to_string(o_net))
@@ -79,8 +79,8 @@ def get_overlay_net(overlay_net_id):
 def create_overlay_net():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         request_dict = request.json
         name_overlay = request_dict.get('name')
         type_overlay = request_dict.get('type')
@@ -111,8 +111,8 @@ def create_overlay_net():
 def delete_overlay_net(overlay_net_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        #tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         code, reason = ctrl_nb_interface.remove_overlay(overlay_net_id, tenantid)
         if code == NbStatusCode.STATUS_INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
             raise ServerError(description=reason)
@@ -135,8 +135,8 @@ def delete_overlay_net(overlay_net_id):
 def assign_slice_ovarlay(overlay_net_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         request_dict = request.json
         slice_name = request_dict.get('name')
         interfaces = request_dict.get('interfaces', [])

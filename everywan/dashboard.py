@@ -34,8 +34,8 @@ authconn = KeystoneAuthConn()
 def dashboard():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         result = {
             'operators': {'total': 1},
             'tenants': {},

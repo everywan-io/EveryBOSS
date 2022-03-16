@@ -64,7 +64,7 @@ def get_tenant(tenant_id):
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         project = authconn.get_project(tenant_id, user_token)
         if (project):
-            tenant_id = '1'
+            # tenant_id = '1'
             tenant = mongodb_client.db.tenants.find_one(
                 {'tenantid': tenant_id}, {'_id': 0})
             if tenant:

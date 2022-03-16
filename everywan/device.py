@@ -33,8 +33,8 @@ authconn = KeystoneAuthConn()
 def list_devices():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         limit = request.args.get('limit', default=20, type=int)
         offset = request.args.get('offset', default=0, type=int)
         
@@ -66,8 +66,8 @@ def list_interfaces():
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
         interfaces = []
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         # limit = request.args.get('limit', default=20, type=int)
         # offset = request.args.get('offset', default=0, type=int)
         available = request.args.get('available', default=False, type=bool)
@@ -185,8 +185,8 @@ def list_interfaces():
 def get_device(device_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         device = mongodb_client.db.devices.find_one(
            {'deviceid': device_id, 'tenantid': tenantid}, {'_id': 0})
         if not device:
@@ -211,10 +211,10 @@ def get_device(device_id):
 def configure_device(device_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
+        tenantid = user_token['project_id']
 
         request_dict = request.json
-        tenantid = "1"  # user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         device_name = request_dict.get('name', '')
         device_description = request_dict.get('description', '')
         interfaces = request_dict.get('interfaces', [])
@@ -246,8 +246,8 @@ def configure_device(device_id):
 def enable_device(device_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         code, reason = ctrl_nb_interface.enable_device(
             deviceid=device_id, tenantid=tenantid)
         if code == NbStatusCode.STATUS_INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
@@ -271,8 +271,8 @@ def enable_device(device_id):
 def disable_device(device_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         code, reason = ctrl_nb_interface.disable_device(
             deviceid=device_id, tenantid=tenantid)
         if code == NbStatusCode.STATUS_INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
@@ -296,8 +296,8 @@ def disable_device(device_id):
 def delete_device(device_id):
     try:
         user_token = authconn.validate_token(request.headers['X-Auth-Token'])
-        # tenantid = user_token['project_id']
-        tenantid = "1"  # user_token['project_id']
+        tenantid = user_token['project_id']
+        # tenantid = "1"  # user_token['project_id']
         code, reason = ctrl_nb_interface.unregister_device(
             deviceid=device_id, tenantid=tenantid)
         if code == NbStatusCode.STATUS_INTERNAL_SERVER_ERROR or code == NbStatusCode.STATUS_SERVICE_UNAVAILABLE:
