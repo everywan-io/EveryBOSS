@@ -23,7 +23,8 @@ import everywan.utils as EWUtil
 import json
 import urllib
 from srv6_sdn_proto.status_codes_pb2 import NbStatusCode
-from srv6_sdn_control_plane.northbound.grpc.nb_grpc_client import STAMPError
+#from srv6_sdn_control_plane.northbound.grpc.nb_grpc_client import STAMPError
+from srv6_delay_measurement.nb_controller_api import STAMPError
 
 # from everywan.db import get_db
 
