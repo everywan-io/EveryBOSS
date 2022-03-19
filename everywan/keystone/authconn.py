@@ -13,10 +13,10 @@
 #  limitations under the License.
 
 from keystoneauth1.identity import v3
-from keystoneauth1 import session
+from keystoneauth1 import session, exceptions
 from keystoneclient.v3 import client
 from http import HTTPStatus
-from everywan.error_handler import Unauthorized
+from everywan.error_handler import Unauthorized, Conflict, BadRequest
 from everywan import KEYSTONE_HOST, KEYSTONE_PORT
 import logging
 
@@ -137,7 +137,22 @@ class KeystoneAuthConn:
         :param user_info: full user info.
         :raises KeystoneAuthConnOperationException: if user creation failed.
         """
-        raise NotImplementedError("The method is not implemented")
+        try:
+            user = self.keystone.users.create(
+                name=user_info['name'],
+                domain=user_info.get('domain', None),
+                password=user_info.get('password', None),
+                email=user_info.get('email', None),
+                description=user_info.get('description', None),
+                default_project=user_info.get('project', None)
+            )
+            return user
+        except exceptions.http.Conflict:
+            raise Conflict()
+        except exceptions.http.BadRequest as err:
+            raise BadRequest(str(err))
+        except Exception as e:
+            raise Unauthorized()
 
     def update_user(self, user_info):
         """
@@ -155,7 +170,15 @@ class KeystoneAuthConn:
         :param user_id: user identifier.
         :raises KeystoneAuthConnOperationException: if user deletion failed.
         """
-        raise NotImplementedError("The method is not implemented")
+        try:
+            result, detail = self.keystone.users.delete(user_id)
+            if result.status_code != 204:
+                raise ClientException(
+                    "error {} {}".format(result.status_code, detail))
+
+            return True
+        except Exception as e:
+            raise Unauthorized()
 
     def get_user_list(self, user_token):
         """
@@ -182,7 +205,7 @@ class KeystoneAuthConn:
         except Exception as e:
             raise Unauthorized()
 
-    def create_project(self, project_info, user_token):
+    def create_project(self, project_info):
         """
         Create a project.
 
@@ -190,9 +213,21 @@ class KeystoneAuthConn:
         :return: the internal id of the created project
         :raises KeystoneAuthConnOperationException: if project creation failed.
         """
-        raise NotImplementedError("The method is not implemented")
+        try:
+            project = self.keystone.projects.create(
+                name=project_info['name'],
+                domain=project_info['domain'],
+                description=project_info.get('description', None)
+            )
+            return project
+        except exceptions.http.Conflict:
+            raise Conflict()
+        except exceptions.http.BadRequest as err:
+            raise BadRequest(str(err))
+        except Exception as e:
+            raise Unauthorized()
 
-    def delete_project(self, project_id, user_token):
+    def delete_project(self, project_id):
         """
         Delete a project.
 
@@ -200,6 +235,7 @@ class KeystoneAuthConn:
         :raises KeystoneAuthConnOperationException: if project deletion failed.
         """
         try:
+            self.keystone.projects.update(project_id, enabled=False)
             result, detail = self.keystone.projects.delete(project_id)
             if result.status_code != 204:
                 raise ClientException(
@@ -253,3 +289,123 @@ class KeystoneAuthConn:
         :return: None
         """
         raise NotImplementedError("The method is not implemented")
+
+    def create_domain(self, domain_info):
+        """
+        Create a domain.
+
+        :param domain_info: full domain info.
+        :return: the internal id of the created domain
+        :raises KeystoneAuthConnOperationException: if domain creation failed.
+        """
+        try:
+            domain = self.keystone.domains.create(
+                name=domain_info['name'],
+                description=domain_info.get('description', None)
+            )
+            return domain
+        except exceptions.http.Conflict:
+            raise Conflict()
+        except exceptions.http.BadRequest as err:
+            raise BadRequest(str(err))
+        except Exception as e:
+            raise Unauthorized()
+
+    def delete_domain(self, domain_id):
+        """
+        Delete a domain.
+
+        :param domain_id: domain identifier.
+        :raises KeystoneAuthConnOperationException: if domain deletion failed.
+        """
+        try:
+            self.keystone.domains.update(domain_id, enabled=False)
+            result, detail = self.keystone.domains.delete(domain_id)
+            if result.status_code != 204:
+                raise ClientException(
+                    "error {} {}".format(result.status_code, detail))
+
+            return True
+        except Exception as e:
+            raise Unauthorized()
+
+    def get_domain_list(self, user_token):
+        """
+        Get all the domains.
+        :param user_token: dictionary to filter user list by name (username is also admited) and/or _id
+        :return: list of domains
+        """
+        try:
+            user = None
+            if user_token:
+                user = user_token["user_id"]
+            domains = self.keystone.domains.list(user=user)
+            print(domains)
+            domains = [{
+                "name": domain.name,
+                "_id": domain.id,
+                "domain_id": domain.domain_id
+            } for domain in domains]
+
+            return domains
+        except Exception as e:
+            self.logger.exception(e)
+            raise Unauthorized()
+
+    def get_domain(self, domain, user_token):
+        """
+        Get one domain
+        :param domain:  domain id or domain name
+        :return: dictionary with the domain information
+        """
+        try:
+            proj = self.keystone.domains.get(domain=domain)
+            return proj
+        except Exception as e:
+            self.logger.exception(e)
+            raise Unauthorized()
+
+    def update_domain(self, domain_id, domain_info, user_token):
+        """
+        Change the information of a domain
+        :param domain_id: domain to be changed
+        :param domain_info: full domain info
+        :return: None
+        """
+        raise NotImplementedError("The method is not implemented")
+
+    def grant_role(self, role, user=None, domain=None, project=None):
+        try:
+            role = self.keystone.roles.list(name=role)[0]
+            self.keystone.roles.grant(
+                role=role.id, user=user, domain=domain, project=project
+            )
+        except Exception as e:
+            self.logger.exception(e)
+            raise Unauthorized()
+
+    def get_user_by_name(self, name, domain, project):
+        """
+        Get one project
+        :param project:  project id or project name
+        :return: dictionary with the project information
+        """
+        try:
+            user = self.keystone.users.list(default_project=project, domain=domain, name=name)
+            return user
+        except Exception as e:
+            self.logger.exception(e)
+            raise Unauthorized()
+
+    def get_project_by_userid(self, userid):
+        """
+        Get one project
+        :param project:  project id or project name
+        :return: dictionary with the project information
+        """
+        try:
+            proj = self.keystone.projects.get(project=project)
+            return proj
+        except Exception as e:
+            self.logger.exception(e)
+            raise Unauthorized()

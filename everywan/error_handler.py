@@ -72,3 +72,11 @@ class ServerError(Error):
             self.description = description
         else:
             self.description = 'Server Error'
+
+
+class Conflict(Error):
+    def __init__(self, description=None):
+        if description is not None:
+            self.description = description
+        else:
+            self.description = 'Conflict'
