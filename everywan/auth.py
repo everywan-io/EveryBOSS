@@ -81,13 +81,13 @@ def logout():
         abort(500, description=e.description)
 
 
-@bp.route('/signup', methods=(['POST']))
+@bp.route('/register', methods=(['POST']))
 def signup():
     try:
         request_dict = request.json
         username = request_dict['username']
         password = request_dict['password']
-        confirm_password = request_dict['confirm_password']  # TODO: implement confirm password
+        confirm_password = request_dict['confirmPassword']
         email = request_dict['email']
         project = request_dict['project_id'] if 'project_id' in request_dict else None
         domain = request_dict['domain'] if 'domain' in request_dict else None
@@ -183,7 +183,7 @@ def signup():
         mongodb_client.db.tenants.insert(
             {
                 'tenantid': project_info.id,
-                'token': token
+                'token': project_info.id + token
             }
         )
 
