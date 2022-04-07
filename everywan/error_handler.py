@@ -58,8 +58,11 @@ class UserNotFound(Error):
 
 
 class Unauthorized(Error):
-    def __init__(self):
-        self.description = 'Unauthorized'
+    def __init__(self, description=None):
+        if description is not None:
+            self.description = description
+        else:
+            self.description = 'Unauthorized'
 
 
 class BadRequest(Error):

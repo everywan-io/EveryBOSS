@@ -15,6 +15,7 @@
 from keystoneauth1.identity import v3
 from keystoneauth1 import session, exceptions
 from keystoneclient.v3 import client
+from keystone.exception import UserNotFound, DomainNotFound
 from http import HTTPStatus
 from everywan.error_handler import Unauthorized, Conflict, BadRequest
 from everywan import KEYSTONE_HOST, KEYSTONE_PORT
@@ -85,6 +86,8 @@ class KeystoneAuthConn:
             }
 
             return auth_token
+        except exceptions.http.Unauthorized:
+            raise Unauthorized('Wrong domain, username or password')
         except Exception as e:
             print(e)
             raise Unauthorized()
